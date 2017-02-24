@@ -87,7 +87,13 @@ Layout styles
 	padding: 1em 1.25em;
 }
 
-.header-heading { margin: 0; }
+.header-heading { 
+	margin: 0;
+	background-image: url("../img/hussar.png");
+	background-size: 42px;
+	background-repeat: no-repeat;
+	padding-left: 50px;
+}
 
 .nav-bar
 {
