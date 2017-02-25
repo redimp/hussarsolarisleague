@@ -11,3 +11,5 @@ Run in development mode
 
     PYTHONPATH=$PWD:$PYTHONPATH FLASK_DEBUG=true FLASK_APP=hsl flask run
 
+or
+    python run.py

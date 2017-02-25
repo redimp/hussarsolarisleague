@@ -1,16 +1,9 @@
-#!/usr/bin/env python
+from hsl import db
 
-from sqlalchemy import Column, Integer, String
-from .database import Base
-
-class User(Base):
-    __tablename__ = 'user'
-    id = Column(Integer, primary_key=True)
-    name = Column(String(50), unique=True)
-    password = Column(String(120), unique=True)
-
-    def __init__(self, name=None):
-        self.name = name
+class User(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    nickname = db.Column(db.String(64), index=True, unique=True)
+    email = db.Column(db.String(120), index=True, unique=True)
 
     def __repr__(self):
-        return '<User %r>' % (self.name)
+        return '<User %r>' % (self.nickname)
