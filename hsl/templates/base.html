@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>31st Hussars - Solaris League</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- icons -->
+    <link rel="apple-touch-icon" href="static/assets/img/hussar-favicon.png">
+    <link rel="shortcut icon" href="static/assets/img/favicon.ico">
+
+    <!-- Override CSS file - add your own CSS rules -->
+    <link rel="stylesheet" href="static/assets/css/styles.css">
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <h1 class="header-heading">31st Hussars - Solaris League</h1>
+      </div>
+      <div class="nav-bar">
+        <ul class="nav">
+          <li><a href="/">Home</a></li>
+{% if g.user.is_authenticated %}
+          <li><a href="/hangar">Hangar</a></li>
+          <li><a href="/games">Games</a></li>
+          <li><a href="{{ url_for('logout') }}">Logout</a></li>
+{% else %}
+          <li><a href="{{ url_for('login') }}">Login</a></li>
+          <li><a href="{{ url_for('register') }}">Sign Up</a></li>
+{% endif %}
+        </ul>
+      </div>
+      <div class="content">
+{% with messages = get_flashed_messages() %}
+  {% if messages %}
+    <ul class=flashes>
+    {% for message in messages %}
+      <li>{{ message }}</li>
+    {% endfor %}
+    </ul>
+  {% endif %}
+{% endwith %}
+        <div class="main">
+        {% block content %}{% endblock %}
+        </div>
+      </div>
+      <div class="footer">
+              &copy; Copyright 2017 <a href="mailto:mail@redimp.de">Red Imp</a>
+               &middot; <a href="https://icons8.com/">Icon credits</a> 
+      </div>
+    </div>
+  </body>
+</html>

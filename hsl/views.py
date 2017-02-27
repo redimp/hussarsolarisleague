@@ -1,7 +1,7 @@
 from hsl import app, db
 from flask import render_template, request, session, request,\
                   flash, url_for, redirect, render_template, abort, g
-from flask.ext.login import login_user, logout_user, current_user, login_required
+from flask_login import login_user, logout_user, current_user, login_required
 from hsl.models import User
 
 @app.before_request
@@ -10,9 +10,9 @@ def before_request():
 
 @app.route('/')
 @app.route('/index')
+@app.route('/home')
 def index():
-    return render_template("base.html")
-    return "Hello, World!"
+    return render_template("index.html")
 
 @app.route('/register' , methods=['GET','POST'])
 def register():
@@ -47,4 +47,9 @@ def logout():
 @login_required
 def hangar():
     return render_template("hangar.html")
+
+@app.route('/games', methods=['GET', 'POST'])
+@login_required
+def games():
+    return render_template("games.html")
 
