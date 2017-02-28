@@ -3,7 +3,7 @@
 <h1>Welcome, Mechwarrior.</h1>
 <hr>
 {% if not g.user.is_authenticated %}
-<p>This website is the home of the 31st Hussars Solaris League. You can login <a href="#">here</a>.</p>
+<p>This website is the home of the 31st Hussars Solaris League. You can login <a href="{{ url_for('login') }}">here</a>.</p>
 {% else %}
 
 {% endif %}

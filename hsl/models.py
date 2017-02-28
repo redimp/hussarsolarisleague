@@ -1,3 +1,9 @@
+"""
+
+ models.py -- contains all the database models of the hsl application
+
+"""
+
 from hsl import db
 from datetime import datetime
 
@@ -14,6 +20,7 @@ class User(db.Model):
         self.password = password
         self.email = email
         self.registered_on = datetime.utcnow()
+
     def is_authenticated(self):
         return True
 
@@ -29,3 +36,7 @@ class User(db.Model):
     def __repr__(self):
         return '<User %r>' % (self.username)
 
+class Setting(db.Model):
+    __tablename__ = "settings"
+    username = db.Column('name', db.String(64), unique=True , index=True, primary_key=True)
+    password = db.Column('value' , db.String(64))
