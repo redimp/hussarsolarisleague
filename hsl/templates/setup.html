@@ -3,7 +3,7 @@
 <h2>Setup Your Hangar</h2>
 <hr>
 <p>Choose the mechs you want to use in this season of the league. You have to pick <b>X</b> mechs. Every chassis can be used only time. You can choose the Trial Variant, if you want or have to, if you lack chassis. Trial variants are the only ones, that can be used more then one time. If you are using the trial variant of a chassis, you are not allowed to use any other variant.</p>
-<div class="form-style-2">
+
 <form action="{{ url_for('setup_hangar') }}" method="post">
 <table class="table table-striped">
     <thead>
@@ -16,12 +16,14 @@
     </thead>
 	<tbody>
     {% for mech in chassis %}
-<tr><td>{{ mech.name }}</td><td>{{ mech.weight }}</td><td><input type="checkbox" name="mech[{{ mech.id }}]" {% if request.form["mech[%i]" % mech.id] %}checked{% endif %}></td>
+<tr class="{{mech.weightclass|lower}}"><td>{{ mech.name }}</td><td>{{ mech.weight }}</td><td><input type="checkbox" name="mech[{{ mech.id }}]" {% if request.form["mech[%i]" % mech.id] %}checked{% endif %}></td>
     <td>{% if mech.trial_available %}<input type="checkbox" name="trial[{{ mech.id }}]" {% if request.form["trial[%i]" % mech.id] %}checked{% endif %}>{% else %}&nbsp;{% endif %}</td></tr>
     {% endfor %}
     </tbody>
 </table>
+<div class="form-style-2">
 <input type="submit" value="Submit" />
-</form>
 </div>
+</form>
+
 {% endblock %}
