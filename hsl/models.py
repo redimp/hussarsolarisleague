@@ -10,8 +10,8 @@ from hsl import db
 
 
 class User(db.Model):
-    __tablename__ = "users"
-    id = db.Column('user_id', db.Integer, primary_key=True)
+    __tablename__ = "user"
+    id = db.Column('id', db.Integer, primary_key=True)
     username = db.Column('username', db.String(64), unique=True, index=True)
     password = db.Column('password', db.String(64))
     email = db.Column('email',db.String(64), unique=True, index=True)
@@ -52,8 +52,22 @@ class Setting(db.Model):
 
 class Chassis(db.Model):
     __tablename__ = "chassis"
-    id = db.Column('chassi_id', db.Integer, primary_key=True)
+    id = db.Column('id', db.Integer, primary_key=True)
     name = db.Column('name', db.String(64), unique=True)
     weight = db.Column('weight', db.Integer)
     weightclass = db.Column('class', db.Enum('Light','Medium','Heavy','Assault'))
+    trial_available = db.Column('trial_available', db.Boolean, default=False)
+
+class Hangar(db.Model):
+    __tablename__ = "hangar"
+    id = db.Column('id', db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    chassis_id = db.Column(db.Integer, db.ForeignKey('chassis.id'))
+    available = db.Column('available', db.Integer)
+    used = db.Column('used', db.Integer)
+    trial = db.Column('trial', db.Boolean)
+
+
+
+
 
