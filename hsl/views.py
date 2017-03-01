@@ -4,7 +4,7 @@ from flask import render_template, request, session, request,\
 from flask_login import login_user, logout_user, current_user, login_required
 import re
 import bcrypt
-from hsl.models import User
+from hsl.models import User, Chassis, Hangar
 
 
 @app.before_request
@@ -74,10 +74,28 @@ def logout():
 @app.route('/hangar', methods=['GET', 'POST'])
 @login_required
 def hangar():
-    return render_template("hangar.html")
+    current_hangar = Hangar.query.filter_by(user_id=g.user.get_id()).all()
+    if len(current_hangar) < 1:
+        return redirect(url_for('setup_hangar'))
+    return render_template("hangar.html", current_hangar=current_hangar)
 
 
 @app.route('/games', methods=['GET', 'POST'])
 @login_required
 def games():
     return render_template("games.html")
+
+@app.route('/setup_hangar', methods=['GET', 'POST'])
+@login_required
+def setup_hangar():
+    current_hangar = Hangar.query.filter_by(user_id=g.user.get_id()).all()
+    if len(current_hangar) > 0:
+        return redirect(url_for('hangar'))
+
+    chassis = Chassis.query.all()
+
+    print request.form
+
+    return render_template("setup.html", chassis=chassis)
+
+

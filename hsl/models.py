@@ -66,8 +66,3 @@ class Hangar(db.Model):
     available = db.Column('available', db.Integer)
     used = db.Column('used', db.Integer)
     trial = db.Column('trial', db.Boolean)
-
-
-
-
-
