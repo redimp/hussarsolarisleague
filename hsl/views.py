@@ -4,9 +4,11 @@ from flask import render_template, request, session, request,\
 from flask_login import login_user, logout_user, current_user, login_required
 from hsl.models import User
 
+
 @app.before_request
 def before_request():
     g.user = current_user
+
 
 @app.route('/')
 @app.route('/index')
@@ -14,42 +16,46 @@ def before_request():
 def index():
     return render_template("index.html")
 
-@app.route('/register' , methods=['GET','POST'])
+
+@app.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'GET':
         return render_template('register.html')
-    user = User(request.form['username'] , request.form['password'], request.form['email'])
+    user = User(request.form['username'], request.form['password'], request.form['email'])
     db.session.add(user)
     db.session.commit()
     flash('User successfully registered')
     return redirect(url_for('login'))
 
-@app.route('/login',methods=['GET','POST'])
+
+@app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'GET':
         return render_template('login.html')
     username = request.form['username']
     password = request.form['password']
-    registered_user = User.query.filter_by(username=username,password=password).first()
+    registered_user = User.query.filter_by(username=username, password=password).first()
     if registered_user is None:
-        flash('Username or Password is invalid' , 'error')
+        flash('Username or Password is invalid', 'error')
         return redirect(url_for('login'))
     login_user(registered_user)
     flash('Logged in successfully')
     return redirect(request.args.get('next') or url_for('index'))
+
 
 @app.route('/logout')
 def logout():
     logout_user()
     return redirect(url_for('index'))
 
+
 @app.route('/hangar', methods=['GET', 'POST'])
 @login_required
 def hangar():
     return render_template("hangar.html")
 
+
 @app.route('/games', methods=['GET', 'POST'])
 @login_required
 def games():
     return render_template("games.html")
-
