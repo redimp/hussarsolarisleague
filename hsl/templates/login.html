@@ -1,26 +1,15 @@
 {% extends "base.html" %}
 {% block content %}
-  <form action="" method=post class="form-horizontal">
-    <h2>Login</h2>
-    <hr>
-    <div class="control-group">
-        <div class="controls">
-          <input type="text" id="username" name="username" class="input-xlarge"
-            placeholder="Enter Username" required>
-        </div>
-    </div>
- 
-    <div class="control-group">
-        <div class="controls">
-          <input type="password" id="password" name="password" class="input-xlarge"
-            placeholder="Enter Password" required>
-        </div>
-    </div>
- 
-    <div class="control-group">
-        <div class="controls">
-          <button type="submit" class="btn btn-success">Signin</button>
-        </div>
-    </div>
-  </form>
+
+<div class="form-style-2">
+<div class="form-style-2-heading">Login</div>
+<form action="{{ url_for('login') }}" method="post">
+<label for="username"><span>Name <span class="required">*</span></span>
+    <input type="text" class="input-field" name="username" value="" /></label>
+<label for="password"><span>Password <span class="required">*</span></span>
+    <input type="password" class="input-field" name="password" value="" /></label>
+<label><span>&nbsp;</span></label><input type="submit" value="Submit" />
+</form>
+</div>
+
 {% endblock %}

@@ -21,6 +21,16 @@ def index():
 def register():
     if request.method == 'GET':
         return render_template('register.html')
+    error = None
+    if len(request.form['username']) < 3:
+        error = "Username too short."
+    elif request.form['password'] != request.form['repeat']:
+        error = "Passwords do not match."
+
+    if error is not None:
+        flash(error, 'error')
+        return render_template('register.html')
+
     user = User(request.form['username'], request.form['password'], request.form['email'])
     db.session.add(user)
     db.session.commit()
@@ -52,6 +62,9 @@ def logout():
 @app.route('/hangar', methods=['GET', 'POST'])
 @login_required
 def hangar():
+    flash('test')
+    flash('error','error')
+    flash('success', 'success')
     return render_template("hangar.html")
 
 

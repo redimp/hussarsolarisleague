@@ -1,36 +1,17 @@
 {% extends "base.html" %}
 {% block content %}
-  <form action="" method=post class="form-horizontal">
-    <h2>Sign up</h2>
-    <hr>
-    <div class="control-group">
-        <div class="controls">
-          <input type="text" id="username" name="username" class="input-xlarge"
-            placeholder="Enter Username" value="{{ request.form.username }}"
-            required>
-        </div>
-    </div>
- 
-    <div class="control-group">
-        <div class="controls">
-          <input type="password" id="password" name="password" class="input-xlarge"
-            placeholder="Enter Password" value="{{ request.form.password }}"
-            required>
-        </div>
-    </div>
- 
-    <div class="control-group">
-        <div class="controls">
-          <input type="email" id="email" name="email" class="input-xlarge"
-            placeholder="Enter Email" value="{{ request.form.username }}"
-            required>
-        </div>
-    </div>
- 
-    <div class="control-group">
-        <div class="controls">
-          <button type="submit" class="btn btn-success">Signup</button>
-        </div>
-    </div>
-  </form>
+<div class="form-style-2">
+<div class="form-style-2-heading">Sign Up</div>
+<form action="{{ url_for('register') }}" method="post">
+<label for="username"><span>Name <span class="required">*</span></span>
+    <input type="text" class="input-field" name="username" value="{{ request.form.username }}" /></label>
+<label for="password"><span>Password <span class="required">*</span></span>
+    <input type="password" class="input-field" name="password" value="{{ request.form.password }}" /></label>
+<label for="repeat"><span>Repeat <span class="required">*</span></span>
+    <input type="password" class="input-field" name="repeat" value="{{ request.form.repeat }}" /></label>
+<label for="repeat"><span>eMail <span class="required">*</span></span>
+    <input type="text" class="input-field" name="email" value="{{ request.form.email }}" /></label>
+<label><span>&nbsp;</span></label><input type="submit" value="Submit" />
+</form>
+</div>
 {% endblock %}
