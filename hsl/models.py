@@ -80,3 +80,18 @@ class Hangar(db.Model):
 
     def is_available(self):
         return self.trial or self.used < self.available
+
+class Game(db.Model):
+    Maps = ['Viridian Bog']
+    id = db.Column('id', db.Integer, primary_key=True)
+    player_home = db.Column('player_home', db.Integer, db.ForeignKey('user.id'))
+    player_away = db.Column('player_away', db.Integer, db.ForeignKey('user.id'))
+    first_winner = db.Column('first_winner', db.Integer, db.ForeignKey('user.id'), nullable=True)
+    second_winner = db.Column('second_winner', db.Integer, db.ForeignKey('user.id'), nullable=True)
+    first_home = db.Column('first_home', db.Integer, db.ForeignKey('hangar.id'), nullable=True)
+    first_away = db.Column('first_away', db.Integer, db.ForeignKey('hangar.id'), nullable=True)
+    second_home = db.Column('second_home', db.Integer, db.ForeignKey('hangar.id'), nullable=True)
+    second_away = db.Column('second_away', db.Integer, db.ForeignKey('hangar.id'), nullable=True)
+    first_map = db.Column('first_map', db.Enum(*Maps), nullable=True)
+    second_map = db.Column('second_map', db.Enum(*Maps), nullable=True)
+
