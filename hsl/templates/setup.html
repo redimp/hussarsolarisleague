@@ -7,15 +7,17 @@
 <form action="{{ url_for('setup_hangar') }}" method="post">
 <table class="table table-striped">
     <thead>
-        <tr>
-            <th>Chassis</th>
-            <th>Weight</th>
-            <th>Pick</th>
-            <th>Pick as Trial</th>
-        </tr>
+        <tr> <th>Chassis</th> <th>Weight</th> <th>Pick</th> <th>Pick as Trial</th> </tr>
     </thead>
 	<tbody>
+    {% set weightclass = "Light" %}
     {% for mech in chassis %}
+    {#
+    {% if weightclass != mech.weightclass %}
+        <tr> <th>{{weightclass}} {{mech.weightclass}} Chassis</th> <th>Weight</th> <th>Pick</th> <th>Pick as Trial</th> </tr>
+        {% set weightclass = mech.weightclass %}
+    {% endif %}
+    #}
 <tr class="{{mech.weightclass|lower}}"><td>{{ mech.name }}</td><td>{{ mech.weight }}</td><td><input type="checkbox" name="mech[{{ mech.id }}]" {% if request.form["mech[%i]" % mech.id] %}checked{% endif %}></td>
     <td>{% if mech.trial_available %}<input type="checkbox" name="trial[{{ mech.id }}]" {% if request.form["trial[%i]" % mech.id] %}checked{% endif %}>{% else %}&nbsp;{% endif %}</td></tr>
     {% endfor %}

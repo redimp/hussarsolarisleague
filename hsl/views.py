@@ -94,7 +94,7 @@ def setup_hangar():
 
     chassis = Chassis.query.all()
 
-    # print request.form
+    print request.form
 
     return render_template("setup.html", chassis=chassis)
 
