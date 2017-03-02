@@ -58,6 +58,7 @@ class Chassis(db.Model):
     weightclass = db.Column('class', db.Enum('Light','Medium','Heavy','Assault'))
     trial_available = db.Column('trial_available', db.Boolean, default=False)
 
+
 class Hangar(db.Model):
     __tablename__ = "hangar"
     id = db.Column('id', db.Integer, primary_key=True)
@@ -66,10 +67,9 @@ class Hangar(db.Model):
     available = db.Column('available', db.Integer)
     used = db.Column('used', db.Integer, default = 0)
     trial = db.Column('trial', db.Boolean)
-
+    # Relationships
     chassis = db.relationship('Chassis', foreign_keys=chassis_id)
     user = db.relationship('User', foreign_keys=user_id)
-
 
     def __init__(self, user_id, chassis_id, trial=False):
         self.user_id = user_id
