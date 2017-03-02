@@ -64,5 +64,19 @@ class Hangar(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     chassis_id = db.Column(db.Integer, db.ForeignKey('chassis.id'))
     available = db.Column('available', db.Integer)
-    used = db.Column('used', db.Integer)
+    used = db.Column('used', db.Integer, default = 0)
     trial = db.Column('trial', db.Boolean)
+
+    chassis = db.relationship('Chassis', foreign_keys=chassis_id)
+    user = db.relationship('User', foreign_keys=user_id)
+
+
+    def __init__(self, user_id, chassis_id, trial=False):
+        self.user_id = user_id
+        self.chassis_id = chassis_id
+        self.trial = trial
+        self.available = 1
+        self.used = 0
+
+    def is_available(self):
+        return self.trial or self.used < self.available

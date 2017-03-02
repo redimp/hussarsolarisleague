@@ -75,7 +75,7 @@ def logout():
 @app.route('/hangar', methods=['GET', 'POST'])
 @login_required
 def hangar():
-    current_hangar = Hangar.query.filter_by(user_id=g.user.get_id()).all()
+    current_hangar = Hangar.query.filter_by(user_id=g.user.get_id()).join(Chassis).order_by(Chassis.weight).all()
     if len(current_hangar) < 1:
         return redirect(url_for('setup_hangar'))
     return render_template("hangar.html", current_hangar=current_hangar)
@@ -108,14 +108,20 @@ def setup_hangar():
         # check rules
         errors = check_hangar_for_errors(mechs, trials)
         if errors is None:
-            # TODO store hangar
-            pass
-        for error in errors:
-            flash(error, 'error')
+            # store hangar
+            for mech_id in selected_mechs:
+                hangar_mech = Hangar(user_id = g.user.get_id(), chassis_id = mech_id, trial = False)
+                db.session.add(hangar_mech)
+            for mech_id in selected_trials:
+                hangar_mech = Hangar(user_id = g.user.get_id(), chassis_id = mech_id, trial = True)
+                db.session.add(hangar_mech)
+            db.session.commit()
+            return redirect(url_for('hangar'))
+        else:
+            for error in errors:
+                flash(error, 'error')
 
     return render_template("setup.html",
             chassis=chassis,
             selected_mechs=selected_mechs,
             selected_trials=selected_trials)
-
-
