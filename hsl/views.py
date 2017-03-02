@@ -5,6 +5,7 @@ from flask_login import login_user, logout_user, current_user, login_required
 import re
 import bcrypt
 from hsl.models import User, Chassis, Hangar
+from  hsl.rules import check_hangar_for_errors
 
 
 @app.before_request
@@ -94,8 +95,27 @@ def setup_hangar():
 
     chassis = Chassis.query.all()
 
-    print request.form
+    # prevent dirty tricks
+    selected_mechs = list(set([int(x) for x in request.form.getlist("mech")]))
+    selected_trials = list(set([int(x) for x in request.form.getlist("trial")]))
 
-    return render_template("setup.html", chassis=chassis)
+    if (len(selected_trials)+len(selected_mechs)) > 0:
+        mechs = Chassis.query.filter(Chassis.id.in_(selected_mechs)).all()
+        trials = Chassis.query.filter(db.and_(Chassis.trial_available, Chassis.id.in_(selected_trials))).all()
+        # prevent dirty tricks
+        selected_mechs = [m.id for m in mechs]
+        selected_trials = [m.id for m in trials]
+        # check rules
+        errors = check_hangar_for_errors(mechs, trials)
+        if errors is None:
+            # TODO store hangar
+            pass
+        for error in errors:
+            flash(error, 'error')
+
+    return render_template("setup.html",
+            chassis=chassis,
+            selected_mechs=selected_mechs,
+            selected_trials=selected_trials)
 
 
