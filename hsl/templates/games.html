@@ -25,7 +25,7 @@
             {% endif %}
             <td>
                 {% if game.status > 0 %}
-                <a href="#">{{ game.get_status() }}</a>
+                <a href="{{ url_for('game_detail',game_id = game.id) }}">{{ game.get_status() }}</a>
                 {% else %}
                 {{ game.get_status() }}
                 {% endif %}

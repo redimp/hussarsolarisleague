@@ -97,6 +97,13 @@ def games():
     return render_template("games.html", games=gamelist)
 
 
+@app.route('/game/<int:game_id>', methods=['GET', 'POST'])
+@login_required
+def game_detail(game_id):
+    game = Game.query.filter_by(id=game_id).first()
+    return render_template("gamedetail.html", game=game)
+
+
 @app.route('/setup_hangar', methods=['GET', 'POST'])
 @login_required
 def setup_hangar():

@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Game {{game.day}} &ndash; <em>{{game.player_home.username}}</em> vs <em>{{game.player_away.username}}</em></h2>
+<hr>
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>#</th>
+            <th>Opponent</th>
+
+        </tr>
+    </thead>
+    <tbody>
+    </tbody>
+</table>
+
+{{ game }}
+
+{% endblock %}
