@@ -4,7 +4,7 @@ from flask import render_template, request, session, request, \
 from flask_login import login_user, logout_user, current_user, login_required
 import re
 import bcrypt
-from hsl.models import User, Chassis, Hangar
+from hsl.models import User, Chassis, Hangar, Game
 from hsl.rules import check_hangar_for_errors
 
 
@@ -90,13 +90,17 @@ def hangar():
 @app.route('/games', methods=['GET', 'POST'])
 @login_required
 def games():
-    return render_template("games.html")
+    gamelist = Game.query.filter(
+                db.or_(Game.player_home_id == g.user.id,
+                       Game.player_away_id == g.user.id)
+            ).order_by(Game.day).all()
+    return render_template("games.html", games=gamelist)
 
 
 @app.route('/setup_hangar', methods=['GET', 'POST'])
 @login_required
 def setup_hangar():
-    current_hangar = Hangar.query.filter_by(user_id=g.user.get_id()).all()
+    current_hangar = Hangar.query.filter_by(user_id=g.user.id).all()
     if len(current_hangar) > 0:
         return redirect(url_for('hangar'))
 
@@ -117,10 +121,10 @@ def setup_hangar():
         if errors is None:
             # store hangar
             for mech_id in selected_mechs:
-                hangar_mech = Hangar(user_id=g.user.get_id(), chassis_id=mech_id, trial=False)
+                hangar_mech = Hangar(user_id=g.user.id, chassis_id=mech_id, trial=False)
                 db.session.add(hangar_mech)
             for mech_id in selected_trials:
-                hangar_mech = Hangar(user_id=g.user.get_id(), chassis_id=mech_id, trial=True)
+                hangar_mech = Hangar(user_id=g.user.id, chassis_id=mech_id, trial=True)
                 db.session.add(hangar_mech)
             db.session.commit()
             return redirect(url_for('hangar'))

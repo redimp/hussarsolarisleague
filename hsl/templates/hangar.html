@@ -19,9 +19,9 @@
             <td>{{mech.used}}</td>
             <td>{% if mech.is_available() %}
                     {% if mech.trial %}
-                        <img alt="Yes" title="Yes" src="/static/assets/img/Checkmark-16.png" />
-                    {%else%}
                         <img alt="Yes, Trial Mech" title="Yes, Trial Mech" src="/static/assets/img/Puzzle-16.png" />
+                    {%else%}
+                        <img alt="Yes" title="Yes" src="/static/assets/img/Checkmark-16.png" />
                     {%endif%}
             {%else%}
                 <img title="No" alt="No" src="assets/img/Delete-16.png" />
