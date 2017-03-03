@@ -1,19 +1,40 @@
 {% extends "base.html" %}
 {% block content %}
-<h2>Game {{game.day}} &ndash; <em>{{game.player_home.username}}</em> vs <em>{{game.player_away.username}}</em></h2>
+<h2>Game {{game.day}}  &nbsp; &ndash; &nbsp; <span style="color:blue;"><em>{{game.player_home.username}}</em></span> &nbsp; vs &nbsp; <span style="color:red;"><em>{{game.player_away.username}}</em></span></h2>
 <hr>
+<form action="{{ url_for('game_detail', game_id = game.id) }}" method="post">
 <table class="table table-striped">
     <thead>
-        <tr>
-            <th>#</th>
-            <th>Opponent</th>
-
-        </tr>
+            <th></th>
+            <th>You</th>
+            <th>Opponent <span style="color:green;">*</span></th>
     </thead>
     <tbody>
+        <tr>
+            <th scope="row">Status</th>
+            <td colspan="2" style="text-align:center;">{{ game.get_status() }}</td>
+        </tr>
+        {% if game.status == 1 %}
+        <tr>
+            <th scope="row">Mech</th>
+            <td><select size="1" name="mech"><option value="">Choose a Mech</option><<option value="">Atlas</option></select></td>
+            <td>&nbsp;...</td>
+        </tr>
+        <tr>
+            <th scope="row">Map</th>
+            <td colspan="2" style="text-align:center;"><em>Map will be displayed when both players have choosen their mechs</em></td>
+        </tr>
+        <tr>
+            <th scope="row">Ready</th>
+            <td><input type="checkbox" name="ready"></td>
+            <td>{% if game.get_opponent_info()[0] %}Ready{% else %}Not ready{% endif %}</td>
+        </tr>
+        {% endif %}
     </tbody>
 </table>
-
-{{ game }}
+<div class="form-style-2">
+<input type="submit" value="Update" />
+</div>
+</form>
 
 {% endblock %}

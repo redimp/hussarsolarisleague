@@ -20,6 +20,8 @@ INSERT INTO "hangar" VALUES(18,2,41,1,0,0);
 INSERT INTO "hangar" VALUES(19,2,42,1,0,0);
 INSERT INTO "hangar" VALUES(20,2,3,1,0,1);
 
+INSERT INTO "user" VALUES(1,'Red Imp','$2b$12$G9oxBVF/GMMUwmAvEiRmNuca0ITwcTIxkLLmPDlP60rbcLjSjcb8K','mail@redimp.de','2017-03-02 09:12:14.678289',0,0);
+
 INSERT INTO "user" VALUES(2,'Potatoe','$2b$12$5ZkfQbkH2hW4PwpDu384m.Dr3dImqr8yDWT5i0PCEfUCF8bKOcXOa','potatoe@redimp.de','2017-03-01 21:33:09.919000',0,0);
 
 INSERT INTO "game" VALUES (1,1,1,2,0,0,NULL,NULL,NULL,NULL,1);

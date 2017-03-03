@@ -101,6 +101,11 @@ def games():
 @login_required
 def game_detail(game_id):
     game = Game.query.filter_by(id=game_id).first()
+    # check permissions
+    if (g.user.id not in [game.player_home_id, game.player_away_id]):
+        flash("You have no permission to access %r" % game,'error')
+        return redirect(url_for('games'))
+
     return render_template("gamedetail.html", game=game)
 
 

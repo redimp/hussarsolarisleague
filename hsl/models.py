@@ -103,11 +103,18 @@ class Game(db.Model):
     def get_status(self):
         s = self.Stati[self.status]
         if s == "Finished":
-            if self.winner == g.user.get_id():
+            if self.winner == g.user.id:
                 return "Win"
             else:
                 return "Loss"
         return s
+
+    def get_opponent_info(self):
+        if self.player_home_id == g.user.id:
+            return (self.ready_away, self.mech_away)
+        else:
+            return (self.ready_home, self.mech_home)
+
 
     def __repr__(self):
         return '<Game #%i %s vs %s>' % (self.id, self.player_home.username, self.player_away.username)
