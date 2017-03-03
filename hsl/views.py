@@ -106,7 +106,18 @@ def game_detail(game_id):
         flash("You have no permission to access %r" % game,'error')
         return redirect(url_for('games'))
 
-    return render_template("gamedetail.html", game=game)
+    if request.method == 'POST':
+        #mech, ready = request.form['mech'], request.form['ready']
+        print request.form
+
+    hangar = Hangar.query.filter(
+            db.and_(Hangar.user_id==g.user.id,
+                    db.or_(Hangar.available>Hangar.used, Hangar.trial)
+                )
+            ).join(Chassis).order_by(Chassis.weight, Chassis.name).all()
+    print hangar
+
+    return render_template("gamedetail.html", game=game, hangar=hangar)
 
 
 @app.route('/setup_hangar', methods=['GET', 'POST'])

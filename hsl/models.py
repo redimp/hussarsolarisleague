@@ -82,6 +82,9 @@ class Hangar(db.Model):
     def is_available(self):
         return self.trial or self.used < self.available
 
+    def __repr__(self):
+        return '<Hangar #%i %s>' % (self.id, self.chassis.name)
+
 class Game(db.Model):
     Maps = ['Viridian Bog']
     Stati = ['Upcoming','Ready to begin','Running','Finished']
