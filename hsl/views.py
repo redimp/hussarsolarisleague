@@ -100,24 +100,59 @@ def games():
 @app.route('/game/<int:game_id>', methods=['GET', 'POST'])
 @login_required
 def game_detail(game_id):
-    game = Game.query.filter_by(id=game_id).first()
+    current_game = Game.query.filter_by(id=game_id).first()
     # check permissions
-    if (g.user.id not in [game.player_home_id, game.player_away_id]):
-        flash("You have no permission to access %r" % game,'error')
+    if g.user.id not in [current_game.player_home_id, current_game.player_away_id]:
+        flash("You have no permission to access %r" % current_game, 'error')
         return redirect(url_for('games'))
 
-    if request.method == 'POST':
-        #mech, ready = request.form['mech'], request.form['ready']
-        print request.form
+    # shortcut
+    home_team = g.user.id == current_game.player_home_id
 
-    hangar = Hangar.query.filter(
-            db.and_(Hangar.user_id==g.user.id,
-                    db.or_(Hangar.available>Hangar.used, Hangar.trial)
+    if home_team:
+        selected_mech, ready = current_game.mech_home, current_game.ready_home
+    else:
+        selected_mech, ready = current_game.mech_away, current_game.ready_away
+
+    print g.user, current_game, request.form
+
+    if request.method == 'POST':
+        if current_game.status == 1:
+            # Ready to begin
+            selected_mech, ready = int(request.form['mech'] or 0), True if request.form.getlist('ready') else False
+            if ready and selected_mech == 0:
+                flash('You have to select a mech to ready up.','warning')
+                ready = False
+            if ready:
+                # mark all other games as unready
+                other_games = Game.query.filter(Game.id != current_game.id, Game.player_home_id == g.user.id, Game.status == 1).all()
+                print other_games
+                for ogame in other_games:
+                    ogame.ready_home = False
+                    ogame.mech_home = None
+                    db.session.add(ogame)
+                other_games = Game.query.filter(Game.id != current_game.id, Game.player_away_id == g.user.id, Game.status == 1).all()
+                print other_games
+                for ogame in other_games:
+                    ogame.ready_away = False
+                    ogame.mech_away = None
+                    db.session.add(ogame)
+                if home_team:
+                    current_game.ready_home = True
+                    current_game.mech_home = selected_mech
+                else:
+                    current_game.ready_away = True
+                    current_game.mech_away = selected_mech
+                db.session.add(current_game)
+                db.session.commit()
+
+    player_hangar = Hangar.query.filter(
+            db.and_(Hangar.user_id == g.user.id,
+                    db.or_(Hangar.available > Hangar.used, Hangar.trial)
                 )
             ).join(Chassis).order_by(Chassis.weight, Chassis.name).all()
-    print hangar
 
-    return render_template("gamedetail.html", game=game, hangar=hangar)
+    return render_template("gamedetail.html", game=current_game, hangar=player_hangar, selected_mech=selected_mech, ready=ready)
 
 
 @app.route('/setup_hangar', methods=['GET', 'POST'])

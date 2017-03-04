@@ -27,7 +27,7 @@
             <th scope="row">Mech</th>
             <td><select style="min-width:100%;" size="1" name="mech"><option value="">Choose a Mech</option>
                 {% for mech in hangar %}
-                <option value="{{ mech.id }}">{{ mech.chassis.name }} {% if mech.trial %}*{% endif %}</option>
+                <option value="{{ mech.id }}" {% if selected_mech == mech.id %}selected{% endif %}>{{ mech.chassis.name }} {% if mech.trial %}*{% endif %}</option>
                 {% endfor %}
                 </select>
             </td>
@@ -38,8 +38,8 @@
             <td colspan="2" style="text-align:center;"><em>Map will be displayed when both players have choosen their mechs</em></td>
         </tr>
         <tr>
-            <th scope="row">Ready</th>
-            <td><input type="checkbox" name="ready"></td>
+            <th scope="row">Ready<sup>[1]</sup></th>
+            <td><input type="checkbox" name="ready" value="ready" {%if ready %}checked="checked"{% endif %}></td>
             <td>{% if game.get_opponent_info()[0] %}Ready <span style="color:green;font-weight:bold;">&bull;&bull;</span>{% else %}Not ready <span style="font-weight:bold;color:red;">&bull;</span>{% endif %}</td>
         </tr>
         {% endif %}
@@ -48,6 +48,8 @@
 <div class="form-style-2">
 <input type="submit" value="Update" />
 </div>
+<p style="font-size:small;"><strong>[1]</strong> You can only be ready in one game at a time.</p>
 </form>
+ready: {{request.form.ready}} mech: {{request.form.mech}}
 
 {% endblock %}
