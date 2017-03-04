@@ -26,27 +26,27 @@ def register():
     if request.method == 'GET':
         return render_template('register.html')
     error = None
-    if len(request.form['username']) < 3:
+    if len(request.form.get('username')) < 3:
         error = "Username too short."
-    elif request.form['password'] != request.form['repeat']:
+    elif request.form.get('password') != request.form.get('repeat'):
         error = "Passwords do not match."
     elif re.match(r"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$",
-                  request.form["email"]) is None:
+                  request.form.get("email")) is None:
         error = "Email looks invalid to me."
 
-    if User.query.filter_by(username=request.form['username'])\
+    if User.query.filter_by(username=request.form.get('username'))\
            .first() is not None:
         error = "Username is already taken."
-    if User.query.filter_by(email=request.form['email']).first() is not None:
+    if User.query.filter_by(email=request.form.get('email')).first() is not None:
         error = "eMail Adress is already taken."
 
     if error is not None:
         flash(error, 'error')
         return render_template('register.html')
 
-    pwhash = bcrypt.hashpw(request.form['password'].encode('utf8'),
+    pwhash = bcrypt.hashpw(request.form.get('password').encode('utf8'),
                            bcrypt.gensalt(12))
-    user = User(request.form['username'], pwhash, request.form['email'])
+    user = User(request.form.get('username'), pwhash, request.form.get('email'))
     db.session.add(user)
     db.session.commit()
     flash('User successfully registered')
@@ -57,8 +57,8 @@ def register():
 def login():
     if request.method == 'GET':
         return render_template('login.html')
-    username = request.form['username']
-    password = request.form['password']
+    username = request.form.get('username')
+    password = request.form.get('password')
     registered_user = User.query.filter_by(username=username).first()
     if registered_user is None or \
             not registered_user.verify_password(password):
