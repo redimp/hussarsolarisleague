@@ -1,4 +1,4 @@
-INSERT INTO "user" VALUES(1,'Tomatoe','$2b$12$G9oxBVF/GMMUwmAvEiRmNuca0ITwcTIxkLLmPDlP60rbcLjSjcb8K','mail@redimp.de','2017-03-02 09:12:14.678289',0,0);
+INSERT INTO "user" VALUES(1,'Tomato','$2b$12$G9oxBVF/GMMUwmAvEiRmNuca0ITwcTIxkLLmPDlP60rbcLjSjcb8K','mail@redimp.de','2017-03-02 09:12:14.678289',0,0);
 
 INSERT INTO "user" VALUES(2,'Potatoe','$2b$12$5ZkfQbkH2hW4PwpDu384m.Dr3dImqr8yDWT5i0PCEfUCF8bKOcXOa','potatoe@redimp.de','2017-03-01 21:33:09.919000',0,0);
 
