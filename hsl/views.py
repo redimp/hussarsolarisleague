@@ -30,9 +30,9 @@ def register():
         error = "Username too short."
     elif request.form.get('password') != request.form.get('repeat'):
         error = "Passwords do not match."
-    elif re.match(r"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$",
-                  request.form.get("email")) is None:
-        error = "Email looks invalid to me."
+    #elif re.match(r"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$",
+    #              request.form.get("email")) is None:
+    #    error = "Email looks invalid to me."*/
 
     if User.query.filter_by(username=request.form.get('username'))\
            .first() is not None:
@@ -46,7 +46,7 @@ def register():
 
     pwhash = bcrypt.hashpw(request.form.get('password').encode('utf8'),
                            bcrypt.gensalt(12))
-    user = User(request.form.get('username'), pwhash, request.form.get('email'))
+    user = User(request.form.get('username'), pwhash, '')
     db.session.add(user)
     db.session.commit()
     flash('User successfully registered')
