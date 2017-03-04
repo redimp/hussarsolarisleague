@@ -222,7 +222,7 @@ ul.flashes
 
 /* colors from http://www.jankoatwarpspeed.com/css-message-boxes-for-different-message-types/ */
 
-.flashes li.success
+p.success, .flashes li.success
 {
     color: #4F8A10;
     background-color: #DFF2BF;

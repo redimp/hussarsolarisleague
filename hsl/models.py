@@ -15,7 +15,7 @@ class User(db.Model):
     id = db.Column('id', db.Integer, primary_key=True)
     username = db.Column('username', db.String(64), unique=True, index=True)
     password = db.Column('password', db.String(64))
-    email = db.Column('email',db.String(64), unique=True, index=True)
+    #email = db.Column('email',db.String(64), unique=True, index=True)
     registered_on = db.Column('registered_on' , db.DateTime)
     in_group = db.Column('in_group', db.Integer, default=0)
     has_premium = db.Column('has_premium', db.Boolean, default=False)
@@ -23,7 +23,7 @@ class User(db.Model):
     def __init__(self, username, password, email):
         self.username = username
         self.password = password
-        self.email = email
+        #self.email = email
         self.registered_on = datetime.utcnow()
 
     def verify_password(self, password):

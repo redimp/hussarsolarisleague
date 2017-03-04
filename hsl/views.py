@@ -37,8 +37,8 @@ def register():
     if User.query.filter_by(username=request.form.get('username'))\
            .first() is not None:
         error = "Username is already taken."
-    if User.query.filter_by(email=request.form.get('email')).first() is not None:
-        error = "eMail Adress is already taken."
+    #if User.query.filter_by(email=request.form.get('email')).first() is not None:
+    #    error = "eMail Adress is already taken."
 
     if error is not None:
         flash(error, 'error')
@@ -104,7 +104,7 @@ def game_detail(game_id):
     current_game = Game.query.filter_by(id=game_id).first()
 
     if current_game is None:
-        abort(404);
+        abort(404)
 
     # check permissions
     if g.user.id not in [current_game.player_home_id, current_game.player_away_id]:
@@ -206,6 +206,7 @@ def setup_hangar():
     # prevent dirty tricks
     selected_mechs = list(set([int(x) for x in request.form.getlist("mech")]))
     selected_trials = list(set([int(x) for x in request.form.getlist("trial")]))
+    everything_ok = False
 
     if (len(selected_trials) + len(selected_mechs)) > 0:
         mechs = Chassis.query.filter(Chassis.id.in_(selected_mechs)).all()
@@ -216,15 +217,18 @@ def setup_hangar():
         # check rules
         errors = check_hangar_for_errors(mechs, trials)
         if errors is None:
-            # store hangar
-            for mech_id in selected_mechs:
-                hangar_mech = Hangar(user_id=g.user.id, chassis_id=mech_id, trial=False)
-                db.session.add(hangar_mech)
-            for mech_id in selected_trials:
-                hangar_mech = Hangar(user_id=g.user.id, chassis_id=mech_id, trial=True)
-                db.session.add(hangar_mech)
-            db.session.commit()
-            return redirect(url_for('hangar'))
+            everything_ok = True
+
+            if len(request.form.getlist("confirmed"))>0:
+                # store hangar
+                for mech_id in selected_mechs:
+                    hangar_mech = Hangar(user_id=g.user.id, chassis_id=mech_id, trial=False)
+                    db.session.add(hangar_mech)
+                for mech_id in selected_trials:
+                    hangar_mech = Hangar(user_id=g.user.id, chassis_id=mech_id, trial=True)
+                    db.session.add(hangar_mech)
+                db.session.commit()
+                return redirect(url_for('hangar'))
         else:
             for error in errors:
                 flash(error, 'error')
@@ -232,4 +236,5 @@ def setup_hangar():
     return render_template("setup.html",
                            chassis=chassis,
                            selected_mechs=selected_mechs,
-                           selected_trials=selected_trials)
+                           selected_trials=selected_trials,
+                           everything_ok=everything_ok)
