@@ -7,13 +7,19 @@
     <thead>
             <th style="width:20%;"></th>
             <th style="width:40%;">You</th>
-            <th style="width:40%;">Opponent {% if game.get_opponent_info()[0] %}<span style="color:green;">&bull;&bull;</span>{% else %}<span style="color:red;">&bull;</span>{% endif %}</th>
+            <th style="width:40%;">Opponent
+                {%if game.status == 1%}
+                {% if game.get_opponent_info()[0] %}<span style="color:green;">&bull;&bull;</span>{% else %}<span style="color:red;">&bull;</span>{% endif %}
+                {% endif %}
+            </th>
     </thead>
     <tbody>
+        {% if game.status < 3 %}
         <tr>
             <th scope="row">Status</th>
             <td colspan="2" style="text-align:center;">{{ game.get_status() }}</td>
         </tr>
+        {% endif %}
         <tr>
             <th scope="row">Team</th>
             {% if g.user.id == game.player_home_id %}
@@ -25,7 +31,7 @@
         {% if game.status == 1 %}
         <tr>
             <th scope="row">Mech</th>
-            <td><select style="min-width:100%;" size="1" name="mech"><option value="">Choose a Mech</option>
+            <td><select style="min-width:100%;" size="1" name="mech"{% if ready %}disabled{% endif %}><option value="">Choose a Mech</option>
                 {% for mech in hangar %}
                 <option value="{{ mech.id }}" {% if selected_mech == mech.id %}selected{% endif %}>{{ mech.chassis.name }} {% if mech.trial %}*{% endif %}</option>
                 {% endfor %}
@@ -42,14 +48,43 @@
             <td><input type="checkbox" name="ready" value="ready" {%if ready %}checked="checked"{% endif %}></td>
             <td>{% if game.get_opponent_info()[0] %}Ready <span style="color:green;font-weight:bold;">&bull;&bull;</span>{% else %}Not ready <span style="font-weight:bold;color:red;">&bull;</span>{% endif %}</td>
         </tr>
+        {% elif game.status in [2,3] %}
+        <tr>
+            <th scope="row">Mech</th>
+            <td>{{ game.get_info()[2] }}</td>
+            <td>{{ game.get_opponent_info()[2] }}</td>
+        </tr>
+        <tr>
+            <th scope="row">Map</th>
+            <td colspan="2">{{ game.map }}</td>
+        </tr>
+        </tr>
+        {% endif %}
+        {% if game.status == 2 %}
+        <tr>
+            <th scope="row">Winner</th>
+            <td colspan="2"><select size="1" name="winner">
+                <option value=""></option>
+                <option value="{{game.player_home_id}}" {%if game.player_home_id == selected_winner %}selected{%endif%}>{{game.player_home.username}}</option>
+                <option value="{{game.player_away_id}}" {%if game.player_away_id == selected_winner %}selected{%endif%}>{{game.player_away.username}}</option>
+            </select></td>
+        </tr>
+        {% endif %}
+        {% if game.status == 3 %}
+        <tr>
+            <th scope="row">Result</th>
+            <td colspan="2" style="text-align:center;">{{ game.get_status() }}</td>
+        </tr>
         {% endif %}
     </tbody>
 </table>
+{% if game.status in [1,2] %}
 <div class="form-style-2">
 <input type="submit" value="Update" />
 </div>
+{% endif %}
 <p style="font-size:small;"><strong>[1]</strong> You can only be ready in one game at a time.</p>
 </form>
-ready: {{request.form.ready}} mech: {{request.form.mech}}
+{# ready: {{request.form.ready}} mech: {{request.form.mech}} selected_winner: {{selected_winner}} #}
 
 {% endblock %}

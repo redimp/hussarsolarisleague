@@ -6,6 +6,7 @@ import re
 import bcrypt
 from hsl.models import User, Chassis, Hangar, Game
 from hsl.rules import check_hangar_for_errors
+import random
 
 
 @app.before_request
@@ -101,6 +102,10 @@ def games():
 @login_required
 def game_detail(game_id):
     current_game = Game.query.filter_by(id=game_id).first()
+
+    if current_game is None:
+        abort(404);
+
     # check permissions
     if g.user.id not in [current_game.player_home_id, current_game.player_away_id]:
         flash("You have no permission to access %r" % current_game, 'error')
@@ -110,18 +115,21 @@ def game_detail(game_id):
     home_team = g.user.id == current_game.player_home_id
 
     if home_team:
-        selected_mech, ready = current_game.mech_home, current_game.ready_home
+        selected_mech, ready = current_game.mech_home_id, current_game.ready_home
+        selected_winner = current_game.winner_home
     else:
-        selected_mech, ready = current_game.mech_away, current_game.ready_away
+        selected_mech, ready = current_game.mech_away_id, current_game.ready_away
+        selected_winner = current_game.winner_away
 
-    print g.user, current_game, request.form
+    #print g.user, current_game, "Form", request.form, "ready", ready
 
     if request.method == 'POST':
         if current_game.status == 1:
             # Ready to begin
-            selected_mech, ready = int(request.form['mech'] or 0), True if request.form.getlist('ready') else False
+            selected_mech = int(request.form['mech'] or 0) if 'mech' in request.form else 0
+            ready = True if request.form.getlist('ready') else False
             if ready and selected_mech == 0:
-                flash('You have to select a mech to ready up.','warning')
+                flash('You have to select a mech to ready up.', 'warning')
                 ready = False
             if ready:
                 # mark all other games as unready
@@ -129,20 +137,50 @@ def game_detail(game_id):
                 print other_games
                 for ogame in other_games:
                     ogame.ready_home = False
-                    ogame.mech_home = None
+                    ogame.mech_home_id = None
                     db.session.add(ogame)
                 other_games = Game.query.filter(Game.id != current_game.id, Game.player_away_id == g.user.id, Game.status == 1).all()
                 print other_games
                 for ogame in other_games:
                     ogame.ready_away = False
-                    ogame.mech_away = None
+                    ogame.mech_away_id = None
                     db.session.add(ogame)
+            if home_team:
+                current_game.ready_home = ready
+                current_game.mech_home_id = selected_mech
+            else:
+                current_game.ready_away = ready
+                current_game.mech_away_id = selected_mech
+
+            if current_game.ready_home and current_game.ready_away:
+                # update status
+                current_game.status = 2
+                # roll map
+                current_game.map = random.choice(Game.Maps)
+                # mark mechs as used
+                mechs = Hangar.query.filter(Hangar.id.in_([current_game.mech_away_id,current_game.mech_home_id])).all()
+                for m in mechs:
+                    m.used += 1
+                    db.session.add(m)
+
+            db.session.add(current_game)
+            db.session.commit()
+        if current_game.status == 2:
+            winner = int(request.form['winner'] or 0)
+            if winner > 0:
                 if home_team:
-                    current_game.ready_home = True
-                    current_game.mech_home = selected_mech
+                    current_game.winner_home = winner
+                    selected_winner = winner
                 else:
-                    current_game.ready_away = True
-                    current_game.mech_away = selected_mech
+                    current_game.winner_away = winner
+                    selected_winner = winner
+
+                if current_game.winner_home == current_game.winner_away:
+                    # both sides decided a winner
+                    current_game.winner = current_game.winner_away
+                    # set new status
+                    current_game.status = 3
+
                 db.session.add(current_game)
                 db.session.commit()
 
@@ -152,7 +190,8 @@ def game_detail(game_id):
                 )
             ).join(Chassis).order_by(Chassis.weight, Chassis.name).all()
 
-    return render_template("gamedetail.html", game=current_game, hangar=player_hangar, selected_mech=selected_mech, ready=ready)
+    return render_template("gamedetail.html", game=current_game, selected_winner=selected_winner,
+                           hangar=player_hangar, selected_mech=selected_mech, ready=ready)
 
 
 @app.route('/setup_hangar', methods=['GET', 'POST'])

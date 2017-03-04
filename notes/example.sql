@@ -24,8 +24,8 @@ INSERT INTO "user" VALUES(1,'Red Imp','$2b$12$G9oxBVF/GMMUwmAvEiRmNuca0ITwcTIxkL
 
 INSERT INTO "user" VALUES(2,'Potatoe','$2b$12$5ZkfQbkH2hW4PwpDu384m.Dr3dImqr8yDWT5i0PCEfUCF8bKOcXOa','potatoe@redimp.de','2017-03-01 21:33:09.919000',0,0);
 
-INSERT INTO "game" VALUES (1,1,1,2,0,0,NULL,NULL,NULL,NULL,1);
-INSERT INTO "game" VALUES (2,2,2,1,0,0,NULL,NULL,NULL,NULL,0);
+INSERT INTO "game" VALUES (1,1,1,2,0,0,NULL,NULL,NULL,NULL,NULL,NULL,1);
+INSERT INTO "game" VALUES (2,2,2,1,0,0,NULL,NULL,NULL,NULL,NULL,NULL,0);
 
 --    id = db.Column('id', db.Integer, primary_key=True)
 --    day = db.Column('day', db.Integer)

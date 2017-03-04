@@ -86,22 +86,26 @@ class Hangar(db.Model):
         return '<Hangar #%i %s>' % (self.id, self.chassis.name)
 
 class Game(db.Model):
-    Maps = ['Viridian Bog']
+    Maps = ['Viridian Bog','Frozen City','Canyon Network']
     Stati = ['Upcoming','Ready to begin','Running','Finished']
     id = db.Column('id', db.Integer, primary_key=True)
     day = db.Column('day', db.Integer)
-    player_home_id = db.Column('player_home', db.Integer, db.ForeignKey('user.id'))
-    player_away_id = db.Column('player_away', db.Integer, db.ForeignKey('user.id'))
+    player_home_id = db.Column('player_home', db.Integer, db.ForeignKey('user.id'), index = True)
+    player_away_id = db.Column('player_away', db.Integer, db.ForeignKey('user.id'), index = True)
     ready_home = db.Column('ready_home', db.Boolean)
     ready_away = db.Column('ready_away', db.Boolean)
     winner = db.Column('winner', db.Integer, db.ForeignKey('user.id'), nullable=True)
-    mech_home = db.Column('mech_home', db.Integer, db.ForeignKey('hangar.id'), nullable=True)
-    mech_away = db.Column('mech_away', db.Integer, db.ForeignKey('hangar.id'), nullable=True)
-    map = db.Column('map', db.Enum(*Maps), nullable=True)
+    winner_home = db.Column('winner_home', db.Integer, db.ForeignKey('user.id'), nullable=True)
+    winner_away = db.Column('winner_away', db.Integer, db.ForeignKey('user.id'), nullable=True)
+    mech_home_id = db.Column('mech_home_id', db.Integer, db.ForeignKey('hangar.id'), nullable=True)
+    mech_away_id = db.Column('mech_away_id', db.Integer, db.ForeignKey('hangar.id'), nullable=True)
+    map = db.Column('map', db.String(24), nullable=True)
     status = db.Column('status', db.Integer, nullable=False, default=0)
     # Relationships
     player_home = db.relationship('User', foreign_keys=player_home_id)
     player_away = db.relationship('User', foreign_keys=player_away_id)
+    mech_home = db.relationship('Hangar', foreign_keys=mech_home_id)
+    mech_away = db.relationship('Hangar', foreign_keys=mech_away_id)
 
     def get_status(self):
         s = self.Stati[self.status]
@@ -114,10 +118,15 @@ class Game(db.Model):
 
     def get_opponent_info(self):
         if self.player_home_id == g.user.id:
-            return (self.ready_away, self.mech_away)
+            return (self.ready_away, self.mech_away_id, self.mech_away.chassis.name if self.mech_away else "")
         else:
-            return (self.ready_home, self.mech_home)
+            return (self.ready_home, self.mech_home_id, self.mech_home.chassis.name if self.mech_home else "")
 
+    def get_info(self):
+        if self.player_home_id == g.user.id:
+            return (self.ready_home, self.mech_home_id, self.mech_home.chassis.name if self.mech_home else "")
+        else:
+            return (self.ready_away, self.mech_away_id, self.mech_away.chassis.name if self.mech_away else "")
 
     def __repr__(self):
         return '<Game #%i %s vs %s>' % (self.id, self.player_home.username, self.player_away.username)

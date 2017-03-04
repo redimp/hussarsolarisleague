@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% block content %}
 <h2>Your Hangar</h2>
-<hr>
+
 <table class="table table-striped">
     <thead>
         <tr>
@@ -24,7 +24,7 @@
                         <img alt="Yes" title="Yes" src="/static/assets/img/Checkmark-16.png" />
                     {%endif%}
             {%else%}
-                <img title="No" alt="No" src="assets/img/Delete-16.png" />
+                <img title="No" alt="No" src="/static/assets/img/Delete-16.png" />
             {%endif%} {#ilable: {{mech.available}} Used: {{mech.used}} Trial: {{mech.trial}}#}
             </td>
         </tr>

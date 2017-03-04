@@ -1,7 +1,6 @@
 {% extends "base.html" %}
 {% block content %}
 <h2>Your Games</h2>
-<hr>
 {% if games %}
 <table class="table table-striped">
     <thead>
@@ -34,7 +33,7 @@
         {% endfor %}
     </tbody>
 </table>
-{{ games }}
+{# {{ games }} #}
 {% else %}
 No games available at the moment. Please wait till the league is set up.
 {% endif %}
