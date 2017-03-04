@@ -11,9 +11,9 @@
 
 <form action="{{ url_for('setup_hangar') }}" method="post">
 {%if everything_ok %}
-<p class="success">
-    Bla Bla. I know what i'm doing. <input type="checkbox" name="confirmed" value="confirmed">
-</p>
+<ul class="flashes">
+  <li class="success">Everything looks fine, please re-check your Hangar and confirm it at the bottom of the page.</li>
+</ul>
 {%endif%}
 <table class="table table-striped">
     <thead>
@@ -27,6 +27,12 @@
     {% endfor %}
     </tbody>
 </table>
+{% if everything_ok %}
+<ul class="flashes">
+  <li class="success">Bla Bla. I know what i'm doing. <input type="checkbox" name="confirmed" value="confirmed"></li>
+</ul>
+{% endif %}
+
 <div class="form-style-2">
 <input type="submit" value="Submit" />
 </div>
