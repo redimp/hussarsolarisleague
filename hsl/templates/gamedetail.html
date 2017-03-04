@@ -36,6 +36,7 @@
                 <option value="{{ mech.id }}" {% if selected_mech == mech.id %}selected{% endif %}>{{ mech.chassis.name }} {% if mech.trial %}*{% endif %}</option>
                 {% endfor %}
                 </select>
+                {% if ready %}<input type="hidden" name="mech" value="{{selected_mech}}">{% endif %}
             </td>
             <td>&nbsp;...</td>
         </tr>
