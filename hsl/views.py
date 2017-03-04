@@ -126,7 +126,7 @@ def game_detail(game_id):
     if request.method == 'POST':
         if current_game.status == 1:
             # Ready to begin
-            selected_mech = int(request.form['mech'] or 0) if 'mech' in request.form else 0
+            selected_mech = int(request.form.get('mech') or 0)
             ready = True if request.form.getlist('ready') else False
             if ready and selected_mech == 0:
                 flash('You have to select a mech to ready up.', 'warning')
@@ -166,7 +166,7 @@ def game_detail(game_id):
             db.session.add(current_game)
             db.session.commit()
         if current_game.status == 2:
-            winner = int(request.form['winner'] or 0)
+            winner = int(request.form.get('winner') or 0)
             if winner > 0:
                 if home_team:
                     current_game.winner_home = winner
