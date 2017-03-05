@@ -4,7 +4,7 @@
 <div class="form-style-2-heading">Sign Up</div>
 <form action="{{ url_for('register') }}" method="post">
 <label for="username"><span>Name <span class="required">*</span></span>
-    <input type="text" class="input-field" name="username" value="{{ request.form.username }}" /></label>
+    <input type="text" class="input-field" name="username" value="{{ request.form.username }}" autofocus/></label>
 <label for="password"><span>Password <span class="required">*</span></span>
     <input type="password" class="input-field" name="password" value="{{ request.form.password }}" /></label>
 <label for="repeat"><span>Repeat <span class="required">*</span></span>
