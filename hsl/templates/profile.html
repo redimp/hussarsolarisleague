@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="form-style-2">
+<div class="form-style-2-heading">Update Premium Status</div>
+<form action="{{ url_for('profile') }}" method="post">
+<label for="premium"><span>Premium</span>
+<input type="checkbox" name="premium" {% if g.user.has_premium %}checked{% endif %} /></label>
+<label><span>&nbsp;</span></label><input type="submit" value="Submit" />
+<input type="hidden" name="update_premium" value="1" />
+</form>
+</div>
+<br/>
+
+<div class="form-style-2">
+<div class="form-style-2-heading">Change Password</div>
+<form action="{{ url_for('profile') }}" method="post">
+<label for="oldpassword"><span>Old Password <span class="required">*</span></span>
+<input type="password" class="input-field" name="oldpassword" value="{{ request.form.oldpassword }}" autofocus/></label>
+<label for="password"><span>New Password <span class="required">*</span></span>
+<input type="password" class="input-field" name="password" value="{{ request.form.password }}" /></label>
+<label for="repeat"><span>Repeat <span class="required">*</span></span>
+<input type="password" class="input-field" name="repeat" value="{{ request.form.repeat }}" /></label>
+<label><span>&nbsp;</span></label><input type="submit" value="Submit" />
+</form>
+</div>
+{% endblock %}

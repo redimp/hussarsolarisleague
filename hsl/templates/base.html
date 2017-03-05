@@ -23,6 +23,7 @@
 {% if g.user.is_authenticated %}
           <li><a href="/hangar">Hangar</a></li>
           <li><a href="/games">Games</a></li>
+            <li><a href="{{ url_for('profile') }}">Profile</a></li>
           <li><a href="{{ url_for('logout') }}">Logout</a></li>
 {% else %}
           <li><a href="{{ url_for('login') }}">Login</a></li>

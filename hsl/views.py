@@ -114,6 +114,40 @@ def login():
     flash('Logged in successfully.', 'success')
     return redirect(request.args.get('next') or url_for('index'))
 
+@app.route('/profile', methods=['GET', 'POST'])
+@login_required
+def profile():
+    if request.method == 'GET':
+        return render_template('profile.html')
+    oldpassword = request.form.get('oldpassword')
+    password = request.form.get('password')
+    repeat = request.form.get('password')
+
+    if request.form.get('update_premium'):
+        g.user.has_premium = (len(request.form.getlist('premium'))>0)
+        db.session.add(g.user)
+        db.session.commit()
+        flash('Premium Status updated', 'success')
+    elif password and oldpassword and repeat and len(password + oldpassword + repeat) > 0:
+        error = None
+        if not g.user.verify_password(oldpassword):
+            error = "The old password is invalid."
+        if password != repeat:
+            error = "Passwords do not match."
+        elif oldpassword == password:
+            error = "Old password and new password are the same."
+        if error is None:
+            pwhash = bcrypt.hashpw(password.encode('utf8'),bcrypt.gensalt(12))
+            # update hash
+            g.user.password = pwhash
+            db.session.add(g.user)
+            db.session.commit()
+            logout_user()
+            flash('Password changed successfully.', 'success')
+            return redirect(url_for('login'))
+        if error is not None:
+            flash(error,'error')
+    return render_template('profile.html')
 
 @app.route('/logout')
 def logout():
