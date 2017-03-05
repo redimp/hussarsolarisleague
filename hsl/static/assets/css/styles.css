@@ -63,11 +63,11 @@ th, td
 	border-bottom: 1px solid #ddd;
 }
 
-a:link { color: royalblue; text-decoration: none; }
-a:visited { color: royalblue; text-decoration: none; }
-a:focus { color: royalblue; text-decoration: none; }
-a:hover { color: royalblue; text-decoration: underline; }
-a:active { color: royalblue; text-decoration: none; }
+a:link { color: #395679; text-decoration: none; }
+a:visited { color: #395679; text-decoration: none; }
+a:focus { color: #395679; text-decoration: none; }
+a:hover { color: #395679; text-decoration: underline; }
+a:active { color: #395679; text-decoration: none; }
 
 /* -----------------------
 Layout styles
@@ -83,7 +83,7 @@ Layout styles
 .header
 {
 	color: #fff;
-	background: #555;
+	background: #395679;
 	padding: 1em 1.25em;
 }
 
@@ -149,13 +149,13 @@ Nav
 .nav a:hover
 {
 	color: white;
-	background-color: green;
+	background-color: #ed7304;
 }
 
 .nav a:active
 {
 	color: white;
-	background-color: red;
+	background-color: #ed7304;
 }
 
 .footer a:link,
@@ -411,7 +411,7 @@ Wide styles
 .form-style-2 .tel-number-field:focus,
 .form-style-2 .textarea-field:focus,
 .form-style-2 .select-field:focus{
-    border: 1px solid #0C0;
+    border: 1px solid #ed7304;
 }
 .form-style-2 .textarea-field{
     height:100px;
