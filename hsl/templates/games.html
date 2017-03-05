@@ -16,10 +16,12 @@
         <tr>
             <th scope="row">{{ game.day }}</th>
             {% if g.user.id == game.player_home_id %}
-            <td>{{game.player_away.username}}</td>
+            <td>{{game.player_away.username}}
+                {%if game.player_away.has_premium %}<img src="/static/assets/img/Star-16.png" />{% endif %}</td>
             <td><strong>Home</strong></td>
             {% else %}
-            <td>{{game.player_home.username}}</td>
+            <td>{{game.player_home.username}}
+                {%if game.player_home.has_premium %}<img src="/static/assets/img/Star-16.png" />{% endif %}</td>
             <td><em>Away</em></td>
             {% endif %}
             <td>
