@@ -1,5 +1,5 @@
-PRAGMA foreign_keys=OFF;
-BEGIN TRANSACTION;
+--PRAGMA foreign_keys=OFF;
+--BEGIN TRANSACTION;
 
 INSERT INTO "settings" VALUES('test_mode','True');
 
@@ -14,4 +14,4 @@ INSERT INTO "hangar" VALUES(6,1,31,1,0,1);
 INSERT INTO "hangar" VALUES(7,1,39,1,0,1);
 INSERT INTO "hangar" VALUES(8,1,41,1,0,1);
 
-COMMIT;
+--COMMIT;
