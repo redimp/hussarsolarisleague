@@ -103,7 +103,10 @@ def login():
         flash('Username or Password is invalid.', 'error')
         return redirect(url_for('login'))
 
-    login_user(registered_user)
+    # check if [x] remember_me was set
+    remember_me = 'remember_me' in request.form
+
+    login_user(registered_user, remember=remember_me)
     flash('Logged in successfully.', 'success')
     return redirect(request.args.get('next') or url_for('index'))
 
@@ -118,7 +121,7 @@ def logout():
 @app.route('/hangar', methods=['GET', 'POST'])
 @login_required
 def hangar():
-    current_hangar = Hangar.query.filter_by(user_id=g.user.get_id())\
+    current_hangar = Hangar.query.filter_by(user_id=g.user.id)\
                      .join(Chassis)\
                      .order_by(Chassis.weight).all()
     if len(current_hangar) < 1:
