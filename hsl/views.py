@@ -48,6 +48,7 @@ def register():
                            bcrypt.gensalt(12))
     user = User(request.form.get('username'), pwhash, '')
     db.session.add(user)
+    db.session.commit()
 
     if get_db_setting('test_mode'):
         # mechs of test user 1
@@ -66,7 +67,7 @@ def register():
             home_game.ready_away = True
             home_game.winner = None
             home_game.winner_home =  None
-            home_game.winner_away = random.choice([1,user.id])
+            home_game.winner_away = user.id
             home_game.mech_home_id = None
             home_game.mech_away_id = random.choice(test_mechs)
             home_game.status = 1
@@ -79,7 +80,7 @@ def register():
             away_game.ready_home = True
             away_game.ready_away = None
             away_game.winner = None
-            home_game.winner_home = random.choice([1, user.id])
+            away_game.winner_home = 1
             away_game.winner_away = None
             away_game.mech_home_id = random.choice(test_mechs)
             away_game.mech_away_id = None
@@ -206,6 +207,7 @@ def game_detail(game_id):
 
             db.session.add(current_game)
             db.session.commit()
+
         if current_game.status == 2:
             winner = int(request.form.get('winner') or 0)
             if winner > 0:

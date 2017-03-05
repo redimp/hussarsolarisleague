@@ -1,7 +1,6 @@
 {% extends "base.html" %}
 {% block content %}
 <h2>Game {{game.day}}  &nbsp; &ndash; &nbsp; <em>{{game.player_home.username}}</em> &nbsp; vs &nbsp; <em>{{game.player_away.username}}</em></h2>
-<hr>
 <form action="{{ url_for('game_detail', game_id = game.id) }}" method="post">
 <table class="table table-striped">
     <thead>
@@ -74,7 +73,13 @@
         {% if game.status == 3 %}
         <tr>
             <th scope="row">Result</th>
-            <td colspan="2" style="text-align:center;">{{ game.get_status() }}</td>
+            <td colspan="2">
+                {% if game.winner == g.user.id %}
+                <img src="/static/assets/img/Trophy-16.png" />
+                {% else %}
+                <img src="/static/assets/img/Thriller-16.png" />
+                {% endif %}
+                {{ game.get_status() }}</td>
         </tr>
         {% endif %}
     </tbody>
