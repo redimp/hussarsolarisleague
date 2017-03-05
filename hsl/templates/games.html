@@ -24,8 +24,16 @@
             {% endif %}
             <td>
                 {% if game.status > 0 %}
+                {% if game.status == 3 and game.winner == g.user.id %}
+                <img src="/static/assets/img/Trophy-16.png" />
+                {% elif game.status == 3 and game.winner != g.user.id %}
+                <img src="/static/assets/img/Thriller-16.png" />
+                {% elif game.status == 2 %}
+                <img src="/static/assets/img/Rubik-16.png" />
+                {% endif %}
                 <a href="{{ url_for('game_detail',game_id = game.id) }}">{{ game.get_status() }}</a>
                 {% else %}
+                <img src="/static/assets/img/Clock-16.png" />
                 {{ game.get_status() }}
                 {% endif %}
             </td>
