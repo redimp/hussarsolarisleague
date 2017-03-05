@@ -23,6 +23,9 @@ def index():
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
+    if not app.config['REGISTER_ENABLED']:
+        flash("Sign up is currently disabled.","warning")
+        return redirect(url_for('index'))
     if request.method == 'GET':
         return render_template('register.html')
     error = None
@@ -281,3 +284,4 @@ def setup_hangar():
                            selected_mechs=selected_mechs,
                            selected_trials=selected_trials,
                            everything_ok=everything_ok)
+
