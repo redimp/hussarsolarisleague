@@ -4,6 +4,13 @@
 <form action="{{ url_for('game_detail', game_id = game.id) }}" method="post">
 <table class="table table-striped">
     <thead>
+        {% if game.status < 3 %}
+        <tr>
+            <th scope="row">Status</th>
+            <td colspan="2">{{ game.get_status() }}</td>
+        </tr>
+        {% endif %}
+        <tr>
             <th style="width:20%;"></th>
             <th style="width:40%;">You</th>
             <th style="width:40%;">Opponent
@@ -11,14 +18,9 @@
                 {% if game.get_opponent_info()[0] %}<span style="color:green;">&bull;&bull;</span>{% else %}<span style="color:red;">&bull;</span>{% endif %}
                 {% endif %}
             </th>
+        </tr>
     </thead>
     <tbody>
-        {% if game.status < 3 %}
-        <tr>
-            <th scope="row">Status</th>
-            <td colspan="2" style="text-align:center;">{{ game.get_status() }}</td>
-        </tr>
-        {% endif %}
         <tr>
             <th scope="row">Team</th>
             {% if g.user.id == game.player_home_id %}
