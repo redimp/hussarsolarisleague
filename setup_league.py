@@ -32,7 +32,8 @@ def fixtures(teams):
         rotation = [rotation[0]] + [rotation[-1]] + rotation[1:-1]
     return fixtures
 
-names_group0 = """Stewon
+"""
+Stewon
 Divisibility
 Bjoern Jorgensson
 Batian
@@ -41,9 +42,8 @@ Phellan Kell
 axerion
 Camron Lyraus
 ShalaLottle
-Hase36"""
-
-names_group1 = """Eiswolf
+Hase36
+Eiswolf
 George Pryde
 SeekanDestroy
 Justifier
@@ -52,8 +52,36 @@ AA-Ace
 Wormflush
 Red Imp
 pabscht
-XXX"""
+neteye
+"""
 
+names_group0 = """
+Eiswolf
+Camron Lyraus
+Wormflush
+Hase36
+Thrawn372
+ShalaLottle
+AA-Ace
+pabscht
+axerion
+Justin
+"""
+
+names_group1 = """
+Phellan Kell
+George Pryde
+Bjoern Jorgensson
+Red Imp
+Stewon
+Divisibility
+SeekanDestroy
+Divisibility
+SeekanDestroy
+Justifier
+Batian
+neteye
+"""
 
 group0, group1 = [], []
 
