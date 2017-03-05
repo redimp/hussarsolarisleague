@@ -93,8 +93,7 @@ class Game(db.Model):
             'Frozen City Night', 'Alpine Peaks', 'Tourmaline Desert',
             'Canyon Network', 'Terra Therma', 'Crimson Strait',
             'HPG Manifold', 'The Mining Collective', 'Viridian Bog',
-            'Polar Highlands', 'Grim Plexus', '1v1 Steiner Coliseum', '2v2 Test',
-            '4v4 Test A', '4v4 Test B']
+            'Polar Highlands', 'Grim Plexus']
     Stati = ['Upcoming','Ready to begin','Running','Finished']
     id = db.Column('id', db.Integer, primary_key=True)
     day = db.Column('day', db.Integer)
