@@ -4,7 +4,7 @@ from flask import render_template, request, session, request, \
 from flask_login import login_user, logout_user, current_user, login_required
 import re
 import bcrypt
-from hsl.models import User, Chassis, Hangar, Game
+from hsl.models import User, Chassis, Hangar, Game, get_db_setting
 from hsl.rules import check_hangar_for_errors
 import random
 
@@ -48,6 +48,44 @@ def register():
                            bcrypt.gensalt(12))
     user = User(request.form.get('username'), pwhash, '')
     db.session.add(user)
+
+    if get_db_setting('test_mode'):
+        # mechs of test user 1
+        test_mechs = []
+        for x in Hangar.query.filter_by(user_id=1).all():
+            test_mechs.append(x.id)
+
+        # create test games
+        for x in xrange(10):
+            # hinspiel
+            home_game = Game()
+            home_game.day = x
+            home_game.player_home_id = user.id
+            home_game.player_away_id = 1
+            home_game.ready_home = None
+            home_game.ready_away = True
+            home_game.winner = None
+            home_game.winner_home =  None
+            home_game.winner_away = user.id
+            home_game.mech_home_id = None
+            home_game.mech_away_id = random.choice(test_mechs)
+            home_game.status = 1
+            db.session.add(home_game)
+            # rueckspiel
+            away_game = Game()
+            away_game.day = x
+            away_game.player_home_id = 1
+            away_game.player_away_id = user.id
+            away_game.ready_home = True
+            away_game.ready_away = None
+            away_game.winner = None
+            away_game.winner_home = user.id
+            away_game.winner_away = None
+            away_game.mech_home_id = random.choice(test_mechs)
+            away_game.mech_away_id = None
+            away_game.status = 1
+            db.session.add(away_game)
+
     db.session.commit()
     flash('User successfully registered')
     return redirect(url_for('login'))

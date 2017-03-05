@@ -19,3 +19,7 @@ db.create_all()
 def load_user(id):
     return models.User.query.get(int(id))
 
+@app.before_request
+def check_for_maintenance():
+    if models.get_db_setting('maintenance'):
+        return 'Sorry, off for maintenance!', 503

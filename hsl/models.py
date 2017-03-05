@@ -47,9 +47,12 @@ class User(db.Model):
 
 class Setting(db.Model):
     __tablename__ = "settings"
-    username = db.Column('name', db.String(64), unique=True, index=True, primary_key=True)
-    password = db.Column('value', db.String(64))
+    name = db.Column('name', db.String(64), unique=True, index=True, primary_key=True)
+    value = db.Column('value', db.String(64))
 
+    def __init__(self, name, value):
+        self.name = name
+        self.value = value
 
 class Chassis(db.Model):
     __tablename__ = "chassis"
@@ -131,3 +134,29 @@ class Game(db.Model):
     def __repr__(self):
         return '<Game #%i %s vs %s>' % (self.id, self.player_home.username, self.player_away.username)
 
+def _string_cast_helper(value):
+    if value is None: return None
+    if value.lower() == "true": return True
+    if value.lower() == "false": return False
+    try:
+        value = int(value)
+    except ValueError:
+        try:
+            value = float(value)
+        except ValueError:
+                pass
+    return value
+
+def get_db_setting(name):
+    entry = Setting.query.filter_by(name=name).first()
+    if entry is None: return None
+    return _string_cast_helper(entry.value)
+
+def set_db_setting(name, value):
+    entry = Setting.query.filter_by(name=name).first()
+    if entry is None:
+        entry = Setting(name=name, value=value)
+    else:
+        entry.value = value
+    db.session.add(entry)
+    db.session.commit()
