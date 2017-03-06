@@ -47,9 +47,8 @@ def register():
         flash(error, 'error')
         return render_template('register.html')
 
-    pwhash = bcrypt.hashpw(request.form.get('password').encode('utf8'),
-                           bcrypt.gensalt(12))
-    user = User(request.form.get('username'), pwhash, '')
+    user = User(request.form.get('username'), '', '')
+    user.set_password(request.form.get('password'))
     db.session.add(user)
     db.session.commit()
 
@@ -132,16 +131,15 @@ def profile():
         error = None
         if not g.user.verify_password(oldpassword):
             error = "The old password is invalid."
-        if len(password)<4:
+        if len(password)<3:
             error = "The new password is too short."
         if password != repeat:
             error = "Passwords do not match."
         elif oldpassword == password:
             error = "Old password and new password are the same."
         if error is None:
-            pwhash = bcrypt.hashpw(password.encode('utf8'),bcrypt.gensalt(12))
             # update hash
-            g.user.password = pwhash
+            g.user.set_password(password)
             db.session.add(g.user)
             db.session.commit()
             logout_user()

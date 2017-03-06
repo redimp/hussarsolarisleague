@@ -30,6 +30,12 @@ class User(db.Model):
         pwhash = bcrypt.hashpw(password.encode('utf8'), self.password.encode('utf8'))
         return self.password == pwhash
 
+    def set_password(self, password):
+        self.password = bcrypt.hashpw(
+                            password.encode('utf8'),
+                            bcrypt.gensalt(12)
+                            )
+
     def is_authenticated(self):
         return True
 
