@@ -1,8 +1,6 @@
 --PRAGMA foreign_keys=OFF;
 --BEGIN TRANSACTION;
 
-INSERT INTO "settings" VALUES('test_mode','True');
-
 INSERT INTO "user" VALUES(1,'Test Imp','$2b$12$TLetVu7qesfGKATdt9PRQu3INDl/JrfQV/IPxC0gRZoWsGNxA8ZwS','2017-03-05 12:46:57.485000',0,0);
 
 INSERT INTO "hangar" VALUES(1,1,3,1,0,1);

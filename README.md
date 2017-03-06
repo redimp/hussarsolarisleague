@@ -9,11 +9,11 @@ afternoon by <mail@redimp.de>. Provided without warranty of any kind.
 Run in development mode
 -----------------------
 
-    PYTHONPATH=$PWD:$PYTHONPATH FLASK_DEBUG=true FLASK_APP=hsl flask run
-
-or
+First, create `hsl/config.py` using `hsl/config.py.skeleton`. Second, create
+the Databse in `hsl/hsl.sqlite` using e.g. `sqlite3 hsl/hsl.sqlite < notes/setup.sql`.
 
     python run.py
 
-Dont forget to check hsl/config.py for the configuration.
+The best way for testing, set `REGISTER_ENABLED=True` and `TEST_MODE=True`.
+You can create the test user with `sqlite3 hsl/hsl.sqlite < notes/testmode.sql`.
 
