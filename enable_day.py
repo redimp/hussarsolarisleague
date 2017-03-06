@@ -37,4 +37,4 @@ if __name__ == "__main__":
         x.status = 1
         db.session.add(x)
     db.session.commit()
-    print "%i games enabled." % len(games)
+    print "%i games on day %i enabled." % (len(games),args.day)

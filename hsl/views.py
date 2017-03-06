@@ -2,8 +2,7 @@ from hsl import app, db
 from flask import render_template, request, session, request, \
                   flash, url_for, redirect, render_template, abort, g
 from flask_login import login_user, logout_user, current_user, login_required
-import re
-import bcrypt
+import hsl
 from hsl.models import User, Chassis, Hangar, Game, get_db_setting
 from hsl.rules import check_hangar_for_errors
 import random
@@ -142,6 +141,7 @@ def profile():
             g.user.set_password(password)
             db.session.add(g.user)
             db.session.commit()
+            hsl.logmsg("password updated.")
             logout_user()
             flash('Password changed successfully.', 'success')
             return redirect(url_for('login'))
@@ -234,6 +234,7 @@ def game_detail(game_id):
                 current_game.status = 2
                 # roll map
                 current_game.map = random.choice(Game.Maps)
+                hsl.logmsg("%s set to status 2 map: %s" % (current_game,current_game.map))
                 # mark mechs as used
                 mechs = Hangar.query.filter(Hangar.id.in_([current_game.mech_away_id,current_game.mech_home_id])).all()
                 for m in mechs:
@@ -258,6 +259,7 @@ def game_detail(game_id):
                     current_game.winner = current_game.winner_away
                     # set new status
                     current_game.status = 3
+                    hsl.logmsg("%s set to status 3 winner: %s" % (current_game, current_game.winner))
 
                 db.session.add(current_game)
                 db.session.commit()
@@ -312,6 +314,7 @@ def setup_hangar():
                     hangar_mech = Hangar(user_id=g.user.id, chassis_id=mech_id, trial=True)
                     db.session.add(hangar_mech)
                 db.session.commit()
+                hsl.logmsg("hangar setup done.")
                 return redirect(url_for('hangar'))
         else:
             for error in errors:

@@ -1,6 +1,7 @@
-from flask import Flask
+from flask import Flask, g
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
+import time
 
 app = Flask(__name__)
 app.config.from_object('hsl.config')
@@ -23,3 +24,10 @@ def load_user(id):
 def check_for_maintenance():
     if models.get_db_setting('maintenance'):
         return 'Sorry, off for maintenance!', 503
+
+
+def logmsg(msg):
+    timestr = time.strftime("%Y-%m-%d %H:%M:%S")
+    user = g.user.username if g.user.is_authenticated else None
+    with open('hsl.log','a') as f:
+        f.write("%s %s %s\n" % (timestr,user,msg))
