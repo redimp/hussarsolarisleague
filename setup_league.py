@@ -2,23 +2,23 @@
 # coding=utf-8
 
 """
- This is ugly and hacked. Will probably be enhanced in the future.
+ This script creates users and matches for groups given in .txt files.
+
+ e.g. $ ./setup_league.py group1.txt group2.txt
+ Potatoe                Archer5625
+ Tomato                 Thunderbolt0766
+ ...
+
 """
 
 import random
 import bcrypt
 import sys
 import operator
+import argparse
 from hsl.models import User, Chassis, Hangar, Game
 from hsl import db
 
-
-def mk_pairs(source):
-        result = []
-        for p1 in range(len(source)):
-                for p2 in range(p1+1,len(source)):
-                        result.append([source[p1],source[p2]])
-        return result
 
 # see http://stackoverflow.com/questions/11245746/league-fixture-generator-in-python
 
@@ -32,63 +32,10 @@ def fixtures(teams):
         rotation = [rotation[0]] + [rotation[-1]] + rotation[1:-1]
     return fixtures
 
-"""
-Stewon
-Divisibility
-Bjoern Jorgensson
-Batian
-Thrawn372
-Phellan Kell
-axerion
-Camron Lyraus
-ShalaLottle
-Hase36
-Eiswolf
-George Pryde
-SeekanDestroy
-Justifier
-Justin
-AA-Ace
-Wormflush
-Red Imp
-pabscht
-neteye
-"""
-
-names_group0 = """
-Eiswolf
-Camron Lyraus
-Wormflush
-Hase36
-Thrawn372
-ShalaLottle
-AA-Ace
-pabscht
-axerion
-Justin
-"""
-
-names_group1 = """
-Phellan Kell
-George Pryde
-Bjoern Jorgensson
-Red Imp
-Stewon
-Divisibility
-SeekanDestroy
-Justifier
-Batian
-neteye
-"""
-
-group0, group1 = [], []
-
-chassisname = [str(x.name).replace(' ','') for x in Chassis.query.all()]
-
 def get_user(name):
     global chassisnames
     password = "%s%04i" % (random.choice(chassisname),random.randint(0,9999))
-    print "%s\t%s" % (name, password)
+    print "%-24s\t%s" % (name, password)
     pwhash = bcrypt.hashpw(password.encode('utf8'),bcrypt.gensalt(12))
     user = User(name,pwhash,'')
     db.session.add(user)
@@ -96,60 +43,47 @@ def get_user(name):
     user = User.query.filter_by(username=name).first()
     return user
 
+# passwords should be simple, yeah, thats
+# biased like hell, but security doesnt really matter.
+chassisname = [str(x.name).replace(' ','') for x in Chassis.query.all()]
 
-for name in names_group0.strip().split("\n"):
-    # create user
-    u = get_user(name)
-    group0.append(u)
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser("Setup League")
+    parser.add_argument("files", help="One text file per group. One name per line.", type=str, nargs="+")
+    args = parser.parse_args()
 
-for name in names_group1.strip().split("\n"):
-    # create user
-    group1.append(get_user(name))
+    for filename in args.files:
+        with open(filename, 'r') as f:
+            group_str = f.read()
 
-for group in [group0, group1]:
-    matches = fixtures(group)
-    for dayc,f in enumerate(matches):
-        n = len(f)
-        matchlist = zip(f[0:n / 2], reversed(f[n / 2:n]))
+        group = []
+        
+        for name in group_str.strip().split("\n"):
+            # create user
+            u = get_user(name)
+            group.append(u)
 
-        for match in matchlist:
-            h, a = match
-            xgame = Game()
-            xgame.player_home_id = h.id
-            xgame.player_away_id = a.id
-            xgame.day = dayc * 2 + 1
-            db.session.add(xgame)
-            #print xgame
-            xgame = Game()
-            xgame.player_home_id = a.id
-            xgame.player_away_id = h.id
-            xgame.day = dayc * 2 + 2
-            db.session.add(xgame)
-            #print xgame
-        print ""
+        if len(group) < 0:
+            print "Error no group found."
 
+        matches = fixtures(group)
+        for dayc,f in enumerate(matches):
+            n = len(f)
+            matchlist = zip(f[0:n / 2], reversed(f[n / 2:n]))
 
-    #print len(group), len(matches), sum([group[0] in x for x in matches])
+            for match in matchlist:
+                h, a = match
+                xgame = Game()
+                xgame.player_home_id = h.id
+                xgame.player_away_id = a.id
+                xgame.day = dayc * 2 + 1
+                db.session.add(xgame)
+                #print xgame
+                xgame = Game()
+                xgame.player_home_id = a.id
+                xgame.player_away_id = h.id
+                xgame.day = dayc * 2 + 2
+                db.session.add(xgame)
+                #print xgame
 
-db.session.commit()
-#maps = """Forest Colony
-#Frozen City
-#Caustic Valley
-#River City
-#Frozen City Night
-#Alpine Peaks
-#Tourmaline Desert
-#Canyon Network
-#Terra Therma
-#Crimson Strait
-#HPG Manifold
-#The Mining Collective
-#Viridian Bog
-#Polar Highlands
-#Grim Plexus
-#1v1 Test
-#2v2 Test
-#4v4 Test A
-#4v4 Test B"""
-
-#print maps.strip().split("\n")
+    db.session.commit()
