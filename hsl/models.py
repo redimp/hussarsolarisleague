@@ -125,15 +125,15 @@ class Game(db.Model):
 
     def get_opponent_info(self):
         if self.player_home_id == g.user.id:
-            return (self.ready_away, self.mech_away_id, self.mech_away.chassis.name if self.mech_away else "")
+            return (self.ready_away, self.mech_away_id, self.mech_away.chassis if self.mech_away else "", self.player_away)
         else:
-            return (self.ready_home, self.mech_home_id, self.mech_home.chassis.name if self.mech_home else "")
+            return (self.ready_home, self.mech_home_id, self.mech_home.chassis if self.mech_home else "", self.player_home)
 
     def get_info(self):
         if self.player_home_id == g.user.id:
-            return (self.ready_home, self.mech_home_id, self.mech_home.chassis.name if self.mech_home else "")
+            return (self.ready_home, self.mech_home_id, self.mech_home.chassis if self.mech_home else "")
         else:
-            return (self.ready_away, self.mech_away_id, self.mech_away.chassis.name if self.mech_away else "")
+            return (self.ready_away, self.mech_away_id, self.mech_away.chassis if self.mech_away else "")
 
     def __repr__(self):
         return '<Game #%i %s vs %s>' % (self.id, self.player_home.username, self.player_away.username)

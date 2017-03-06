@@ -1,6 +1,8 @@
 {% extends "base.html" %}
 {% block content %}
-<h2>Game {{game.day}}  &nbsp; &ndash; &nbsp; <em>{{game.player_home.username}}</em> &nbsp; vs &nbsp; <em>{{game.player_away.username}}</em></h2>
+<h2><a href="{{ url_for('game_detail', game_id = game.id) }}">Game {{game.day}}  &nbsp; &ndash; &nbsp; 
+	<em>{{game.player_home.username}}</em> &nbsp; vs &nbsp; 
+	<em>{{game.player_away.username}}</em> </h2></a>
 <form action="{{ url_for('game_detail', game_id = game.id) }}" method="post">
 <table class="table table-striped">
     <thead>
@@ -29,6 +31,11 @@
             <td>Team 2</td><td>Team 1</td>
             {% endif %}
         </tr>
+        <tr>
+            <th scope="row">Premium</th>
+            <td>{%if g.user.has_premium %}<img src="/static/assets/img/Star-16.png" />{% endif %}</td>
+            <td>{%if game.get_opponent_info()[3].has_premium %}<img src="/static/assets/img/Star-16.png" />{% endif %}</td>
+        </tr>
         {% if game.status == 1 %}
         <tr>
             <th scope="row">Mech</th>
@@ -52,9 +59,9 @@
         </tr>
         {% elif game.status in [2,3] %}
         <tr>
-            <th scope="row">Mech</th>
-            <td>{{ game.get_info()[2] }}</td>
-            <td>{{ game.get_opponent_info()[2] }}</td>
+            <th scope="row">Mech/Weight</th>
+            <td>{{ game.get_info()[2].name }} ({{ game.get_info()[2].weight }})</td>
+            <td>{{ game.get_opponent_info()[2].weight }}</td>
         </tr>
         <tr>
             <th scope="row">Map</th>
