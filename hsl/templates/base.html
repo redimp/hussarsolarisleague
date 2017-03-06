@@ -27,7 +27,9 @@
           <li><a href="/hangar">Hangar</a></li>
           <li><a href="/games">Games</a></li>
             <li><a href="{{ url_for('profile') }}">Profile</a></li>
+	    <div style="float:right;">
           <li><a href="{{ url_for('logout') }}">Logout</a></li>
+	  </div>
 {% else %}
           <li><a href="{{ url_for('login') }}">Login</a></li>
     {%if config.REGISTER_ENABLED %}
