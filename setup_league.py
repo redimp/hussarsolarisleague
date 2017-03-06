@@ -76,8 +76,6 @@ Red Imp
 Stewon
 Divisibility
 SeekanDestroy
-Divisibility
-SeekanDestroy
 Justifier
 Batian
 neteye
