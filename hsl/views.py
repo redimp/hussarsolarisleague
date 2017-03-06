@@ -62,7 +62,7 @@ def register():
         for x in xrange(4):
             # hinspiel
             home_game = Game()
-            home_game.day = x
+            home_game.day = x*2+1
             home_game.player_home_id = user.id
             home_game.player_away_id = 1
             home_game.ready_home = None
@@ -76,7 +76,7 @@ def register():
             db.session.add(home_game)
             # rueckspiel
             away_game = Game()
-            away_game.day = x
+            away_game.day = x+2+2
             away_game.player_home_id = 1
             away_game.player_away_id = user.id
             away_game.ready_home = True
