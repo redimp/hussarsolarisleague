@@ -61,7 +61,12 @@
         <tr>
             <th scope="row">Mech/Weight</th>
             <td>{{ game.get_info()[2].name }} ({{ game.get_info()[2].weight }})</td>
-            <td>{{ game.get_opponent_info()[2].weight }}</td>
+            <td>{% if game.status == 2 %}
+                {{ game.get_opponent_info()[2].weight }}
+                {% else %}
+                {{ game.get_opponent_info()[2].name }} ({{ game.get_opponent_info()[2].weight }})
+                {% endif %}
+            </td>
         </tr>
         <tr>
             <th scope="row">Map</th>
