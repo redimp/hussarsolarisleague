@@ -287,8 +287,14 @@ def setup_hangar():
     everything_ok = False
 
     if (len(selected_trials) + len(selected_mechs)) > 0:
-        mechs = Chassis.query.filter(Chassis.id.in_(selected_mechs)).all()
-        trials = Chassis.query.filter(db.and_(Chassis.trial_available, Chassis.id.in_(selected_trials))).all()
+        if len(selected_mechs)>0:
+            mechs = Chassis.query.filter(Chassis.id.in_(selected_mechs)).all()
+        else:
+            mechs = []
+        if len(selected_trials)>0:
+            trials = Chassis.query.filter(db.and_(Chassis.trial_available, Chassis.id.in_(selected_trials))).all()
+        else:
+            trials = []
         # prevent dirty tricks
         selected_mechs = [m.id for m in mechs]
         selected_trials = [m.id for m in trials]
