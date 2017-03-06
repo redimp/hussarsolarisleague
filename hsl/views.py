@@ -213,13 +213,11 @@ def game_detail(game_id):
             if ready:
                 # mark all other games as unready
                 other_games = Game.query.filter(Game.id != current_game.id, Game.player_home_id == g.user.id, Game.status == 1).all()
-                print other_games
                 for ogame in other_games:
                     ogame.ready_home = False
                     ogame.mech_home_id = None
                     db.session.add(ogame)
                 other_games = Game.query.filter(Game.id != current_game.id, Game.player_away_id == g.user.id, Game.status == 1).all()
-                print other_games
                 for ogame in other_games:
                     ogame.ready_away = False
                     ogame.mech_away_id = None
