@@ -53,7 +53,7 @@ def register():
     db.session.add(user)
     db.session.commit()
 
-    if get_db_setting('test_mode'):
+    if app.config['TEST_MODE']:
         # mechs of test user 1
         test_mechs = []
         for x in Hangar.query.filter_by(user_id=1).all():
