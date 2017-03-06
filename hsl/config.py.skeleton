@@ -1,7 +1,13 @@
+#!/usr/bin/env python
+
 import os
 basedir = os.path.abspath(os.path.dirname(__file__))
-
+# database path
 SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(basedir, 'hsl.sqlite')
-SECRET_KEY = 'ied8Wohquoovielee8yae0aip3pef1th'
+# change this
+SECRET_KEY = 'oujoh8oDielo8oorahzaD3geiphahxoh'
 SQLALCHEMY_TRACK_MODIFICATIONS = False
-REGISTER_ENABLED = False
+REGISTER_ENABLED = True
+TEST_MODE = False
+PORT = 5000
+DEBUG = False
