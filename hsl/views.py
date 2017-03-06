@@ -132,6 +132,8 @@ def profile():
         error = None
         if not g.user.verify_password(oldpassword):
             error = "The old password is invalid."
+        if len(password)<4:
+            error = "The new password is too short."
         if password != repeat:
             error = "Passwords do not match."
         elif oldpassword == password:
