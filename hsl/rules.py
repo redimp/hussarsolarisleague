@@ -13,10 +13,10 @@ def check_hangar_for_errors(mechs, trials):
     min_h = 4
     min_a = 4
 
-    max_l = 6
-    max_m = 6
-    max_h = 6
-    max_a = 6
+    max_l = 5
+    max_m = 5
+    max_h = 5
+    max_a = 5
 
     min_total = 18
     max_total = 18
