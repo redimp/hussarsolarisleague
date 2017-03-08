@@ -1,0 +1,114 @@
+[b][color=#2360dd][size=6]Punkte[/size][/color][/b]
+
+Die Punkte werden in der [b]Season 2[/b] nach den Gewichtsklassen der Mechs vergeben:
+
+
+[table]
+ [tr]
+  [td][color=#2360dd]Win[/color] / [color=#dd9323]Loss[/color][/td][td][color=#dd9323]L[/color][/td][td][color=#dd9323]M[/color][/td][td][color=#dd9323]H[/color][/td][td][color=#dd9323]A[/color][/td]
+ [tr]
+ [tr]
+  [td][color=#2360dd]L[/color][/td][td]1.00[/td][td]1.75[/td][td]2.25[/td][td]2.50[/td]
+ [tr]
+ [tr]
+  [td][color=#2360dd]M[/color][/td][td]0.75[/td][td]1.00[/td][td]1.50[/td][td]1.75[/td]
+ [tr]
+ [tr]
+  [td][color=#2360dd]H[/color][/td][td]0.70[/td][td]0.80[/td][td]1.00[/td][td]1.10[/td]
+ [tr]
+ [tr]
+  [td][color=#2360dd]A[/color][/td][td]0.60[/td][td]0.75[/td][td]0.90[/td][td]1.00[/td]
+ [tr]
+[/table]
+
+Ein paar Beispiele:
+
+Assault schlaegt Light: 0.6 Punkte
+Medium schlaegt Heavy: 1.5 Punkte
+
+[size=6]Begruendung[/size]
+
+Wie kommen wir auf diese Tabelle?
+
+[color=#2360dd][size=5]TL;DR:[/size] Mathematik.[/color]  [user]15893834[/user]  und ich (Divi hat die Arbeit gemacht, ich hab nur rumgemeckert) haben die Ergebnisse der letzte Saison der Hussaren Liga analysiert. 
+
+
+[spoiler=Im Ernst, ich will es wirklich wissen]
+
+[center][img]http://assets-cloud.enjin.com/users/15612372/pics/original/3885681.jpg[/img][/center]
+
+Anhand der Daten haben wir die Wahrscheinlichkeiten ausgerechnet mit denen eine Gewichtsklasse eine andere schlaegt. Das sieht dann wie folgt aus:
+
+
+[table]
+ [tr]
+  [td][/td][td]L[/td][td]M[/td][td]H[/td][td]A[/td]
+ [tr]
+ [tr]
+  [td]L[/td][td]0.5[/td][td]0.2667[/td][td]0.2143[/td][td]0.1875[/td]
+ [tr]
+ [tr]
+  [td]M[/td][td]0.7333[/td][td]0.5[/td][td]0.1667[/td][td]0.3333[/td]
+ [tr]
+ [tr]
+  [td]H[/td][td]0.7857[/td][td]0.8333[/td][td]0.5[/td][td]0.4375[/td]
+ [tr]
+ [tr]
+  [td]A[/td][td]0.8125[/td][td]0.6667[/td][td]0.5625[/td][td]0.5[/td]
+ [tr]
+[/table]
+
+Daraus kann man den Erwartungswert errechnen wieviele Punkte man in einem Spiel erreichen kann. In der letzten Liga gab es bei einem Sieg immer 3 Punkte, was mathematisch 1 Punkt ist. Der Erwartungswert fuer die Punkte in einer Klasse war in der letzten Season wie folgt:
+
+
+[table]
+ [tr]
+  [td]L[/td][td]M[/td][td]H[/td][td]A[/td]
+ [tr]
+ [tr]
+  [td]0.4512[/td][td]0.6697[/td][td]1.0000[/td][td]0.9964[/td]
+ [tr]
+[/table]
+
+Man kann mittels Regression eine Funktion an die Daten fitten, dass es die Chance auf einen Punkt besser verteilt ist. (In diesem Fall war das Verfahren Alternating Least Squares.) Das sieht dann so aus:
+
+
+[table]
+ [tr]
+    [td][/td][td]L[/td][td]M[/td][td]H[/td][td]A[/td]
+ [tr]
+ [tr]
+  [td]L[/td][td]1.0000[/td][td]1.8750[/td][td]2.3333[/td][td]2.6667[/td]
+ [tr]
+ [tr]
+  [td]M[/td][td]0.6818[/td][td]1.0000[/td][td]3.0000[/td][td]1.5000[/td]
+ [tr]
+ [tr]
+  [td]H[/td][td]0.6364[/td][td]0.6000[/td][td]1.0000[/td][td]1.1429[/td]
+ [tr]
+ [tr]
+  [td]A[/td][td]0.6154[/td][td]0.7500[/td][td]0.8889[/td][td]1.0000[/td]
+ [tr]
+[/table]
+
+Dem geneigten Leser (ich vermute, es ist nur noch einer) wird aufallen, dass da seltsame Werte vorkommen. Zum Beispiel wuerde ein Medium fuer den Sieg ueber einen Heavy 3 Punkte bekommen. 
+
+Das resultiert daraus, dass wir nur "wenige" Daten zur Verfuegung haben (es waren nur 220 Spiele) und ein Verfahren gerne zum overfitting neigt.
+
+Deswegen haben wir die Tabelle basierend auf unsere Erfahrungen angepasst. Das Ergebnis seht ihr oben.
+
+Nimmt man unsere Punkte und wertet die letzte Season aus, ergibt sich die folgende Tabelle fuer den Erwartungswert wieviele Punkte man in einem Spiel holt:
+
+
+[table]
+ [tr]
+  [td]L[/td][td]M[/td][td]H[/td][td]A[/td]
+ [tr]
+ [tr]
+  [td]0.8751[/td][td]0.8501[/td][td]1.0000[/td][td]0.9167[/td]
+ [tr]
+[/table]
+
+Ja, lieber Leser (vermutlich der gleiche wie oben) mit Heavies hat man [i]weiterhin[/i] die besten Chancen viele Punkte zu holen. Dafuer muss man aber erstens ein idealisierter durchschnittlicher Spieler der letzten Saison sein und zweitens unendlich oft gespielt haben. Bzgl Fragen oder Hexenverbrennung geht es [url=http://wuuu.enjin.com/profile/15893834]hier entlang[/url].
+
+[/spoiler]
