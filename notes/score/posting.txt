@@ -30,10 +30,10 @@ Medium schlaegt Heavy: 1.5 Punkte
 
 Wie kommen wir auf diese Tabelle?
 
-[color=#2360dd][size=5]TL;DR:[/size] Mathematik.[/color]  [user]15893834[/user]  und ich (Divi hat die Arbeit gemacht, ich hab nur rumgemeckert) haben die Ergebnisse der letzte Saison der Hussaren Liga analysiert. 
+[size=5][color=#2360dd]TL;DR:[/color][/size] Mathematik.[/color]  Divisibility und ich (Divi hat die Arbeit gemacht, ich hab nur rumgemeckert) haben die Ergebnisse der letzte Saison der Hussaren Liga analysiert. 
 
 
-[spoiler=Im Ernst, ich will es wirklich wissen]
+Im Ernst, ich will es wirklich wissen:
 
 [center][img]http://assets-cloud.enjin.com/users/15612372/pics/original/3885681.jpg[/img][/center]
 
@@ -111,4 +111,3 @@ Nimmt man unsere Punkte und wertet die letzte Season aus, ergibt sich die folgen
 
 Ja, lieber Leser (vermutlich der gleiche wie oben) mit Heavies hat man [i]weiterhin[/i] die besten Chancen viele Punkte zu holen. Dafuer muss man aber erstens ein idealisierter durchschnittlicher Spieler der letzten Saison sein und zweitens unendlich oft gespielt haben. Bzgl Fragen oder Hexenverbrennung geht es [url=http://wuuu.enjin.com/profile/15893834]hier entlang[/url].
 
-[/spoiler]
