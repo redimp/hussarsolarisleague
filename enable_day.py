@@ -14,18 +14,8 @@ import argparse
 from hsl.models import Game
 from hsl import db
 
-def generate_password():
-    list = [str(x.name).replace(' ','') for x in Chassis.query.all()]
-    if len(list)>8:
-        prefix = random.choice(list)
-    else:
-        prefix = ''.join(random.choice(string.ascii_uppercase + string.ascii_lowercase) for _ in range(6))
-
-    return "%s%04i" % (prefix,random.randint(0,9999))
-
-
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser("Setup League")
+    parser = argparse.ArgumentParser("Enable Gameday")
     parser.add_argument("day", help="number of the day", type=int)
     parser.add_argument("--verbose", "-v", help="verbose mode", action='store_true')
     args = parser.parse_args()
