@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Scoreboard</h2>
+Day: {% for day in gamedays %}
+{% if day == display_gameday %}
+<strong>{{day}}</strong>&nbsp;
+{% else %}
+<a href=""{{ url_for('scoreboard', day=day) }}">{{day}}</a>&nbsp;
+{% endif %}
+{% endfor %}
+<hr/>
+
+{% for (group,games) in groups_and_games.iteritems() %}
+<h3>Group {{group}}</h3>
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>&nbsp;</th>
+            <th>Home</th>
+            <th>Away</th>
+            <th>&nbsp;</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for game in games %}
+        <tr>
+            <td>{%if not game.winner %}<img src="/static/assets/img/Clock-16.png" />{%else%}&nbsp;{%endif%}</td>
+            <td>{{game.player_home.username}} {%if game.winner == game.player_home_id%} <img src="/static/assets/img/Trophy-16.png" />{%endif%}</td>
+            <td>{{game.player_away.username}} {%if game.winner == game.player_away_id%} <img src="/static/assets/img/Trophy-16.png" />{%endif%}</td>
+            <td>&nbsp;</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endfor %}
+
+{% endblock %}

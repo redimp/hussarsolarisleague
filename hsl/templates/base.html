@@ -23,6 +23,7 @@
           		<li><span style="color:red;">TEST MODE</span></li>
 		{% endif %}
           <li><a href="/">Home</a></li>
+          <li><a href="{{ url_for('scoreboard') }}">Scoreboard</a></li>
 {% if g.user.is_authenticated %}
           <li><a href="/hangar">Hangar</a></li>
           <li><a href="/games">Games</a></li>
