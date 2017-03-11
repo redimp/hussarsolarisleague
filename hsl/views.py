@@ -326,14 +326,17 @@ def setup_hangar():
                            selected_trials=selected_trials,
                            everything_ok=everything_ok)
 
-@app.route('/scoreboard', methods=['GET', 'POST'])
-@app.route('/scoreboard/<int:day>', methods=['GET', 'POST'])
+@app.route('/scoreboard/<int:day>')
+@app.route('/scoreboard')
 def scoreboard(day=None):
-    gamedays = sorted(list(set([x.day for x in Game.query.filter(Game.status>0).group_by(day).all()])))
+    gamedays = sorted(list(set([x.day for x in Game.query.filter(Game.status>0).group_by(Game.day).all()])))
+    inactive_gamedays = sorted(list(set([x.day for x in Game.query.filter(Game.status == 0).group_by(Game.day).all()])))
     group_ids = sorted(list(set([x.in_group for x in User.query.all()])))
     # pick last day
     if day is None:
         day = gamedays[-1]
+
+    print gamedays
 
     # for each group collect games of the chosen day:
     groups_and_games = {}
@@ -350,4 +353,4 @@ def scoreboard(day=None):
 
     print groups_and_games
 
-    return render_template("scoreboard.html", display_gameday=day, gamedays=gamedays, groups_and_games=groups_and_games)
+    return render_template("scoreboard.html", display_gameday=day, gamedays=gamedays, inactive_gamedays=inactive_gamedays, groups_and_games=groups_and_games)

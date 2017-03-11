@@ -1,11 +1,13 @@
 {% extends "base.html" %}
 {% block content %}
 <h2>Scoreboard</h2>
-Day: {% for day in gamedays %}
+Day: {% for day in gamedays + inactive_gamedays %}
 {% if day == display_gameday %}
 <strong>{{day}}</strong>&nbsp;
+{% elif day in inactive_gamedays %}
+<em>{{day}}</em>&nbsp;
 {% else %}
-<a href=""{{ url_for('scoreboard', day=day) }}">{{day}}</a>&nbsp;
+<a href="{{ url_for('scoreboard', day=day) }}">{{day}}</a>&nbsp;
 {% endif %}
 {% endfor %}
 <hr/>
@@ -18,7 +20,6 @@ Day: {% for day in gamedays %}
             <th>&nbsp;</th>
             <th style="text-align:right;">Home</th>
             <th>Away</th>
-            <th>&nbsp;</th>
         </tr>
     </thead>
     <tbody>
@@ -27,7 +28,6 @@ Day: {% for day in gamedays %}
             <td>{%if not game.winner %}<img src="/static/assets/img/Clock-16.png" />{%else%}&nbsp;{%endif%}</td>
             <td style="text-align:right;">{%if game.winner == game.player_home_id%} <img src="/static/assets/img/Trophy-16.png" />{%endif%} {{game.player_home.username}}</td>
             <td style="text-align:left;">{{game.player_away.username}} {%if game.winner == game.player_away_id%} <img src="/static/assets/img/Trophy-16.png" />{%endif%}</td>
-            <td>&nbsp;</td>
         </tr>
         {% endfor %}
     </tbody>
