@@ -26,8 +26,17 @@ Day: {% for day in gamedays + inactive_gamedays %}
         {% for game in games %}
         <tr>
             <td>{%if not game.winner %}<img src="/static/assets/img/Clock-16.png" />{%else%}&nbsp;{%endif%}</td>
-            <td style="text-align:right;">{%if game.winner == game.player_home_id%} <img src="/static/assets/img/Trophy-16.png" />{%endif%} {{game.player_home.username}}</td>
-            <td style="text-align:left;">{{game.player_away.username}} {%if game.winner == game.player_away_id%} <img src="/static/assets/img/Trophy-16.png" />{%endif%}</td>
+            <td style="text-align:right;">{%if game.winner == game.player_home_id%} <img src="/static/assets/img/Trophy-16.png" />{%endif%} 
+            {%if g.user == game.player_home %}<strong>{{game.player_home.username}}</strong>
+            {%else%}{{game.player_home.username}}
+            {%endif%}
+        </td>
+            <td style="text-align:left;">
+            {%if g.user == game.player_away %}<strong>{{game.player_away.username}}</strong>
+            {%else%}
+            {{game.player_away.username}}
+            {%endif%}
+            {%if game.winner == game.player_away_id%} <img src="/static/assets/img/Trophy-16.png" />{%endif%}</td>
         </tr>
         {% endfor %}
     </tbody>
