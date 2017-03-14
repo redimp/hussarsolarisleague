@@ -54,11 +54,11 @@ if __name__ == "__main__":
 
     for filename in args.files:
         with open(filename, 'r') as f:
-            group_str = f.read()
+            group_str = f.read().splitlines()
 
         group = []
         
-        for name in group_str.strip().split("\n"):
+        for name in group_str:
             # create user
             u = get_user(name)
             group.append(u)
