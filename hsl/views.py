@@ -75,7 +75,7 @@ def register():
             db.session.add(home_game)
             # rueckspiel
             away_game = Game()
-            away_game.day = x+2+2
+            away_game.day = x*2+2
             away_game.player_home_id = 1
             away_game.player_away_id = user.id
             away_game.ready_home = True
@@ -354,3 +354,4 @@ def scoreboard(day=None):
     #print groups_and_games
 
     return render_template("scoreboard.html", display_gameday=day, gamedays=gamedays, inactive_gamedays=inactive_gamedays, groups_and_games=groups_and_games)
+
