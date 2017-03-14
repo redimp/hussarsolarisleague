@@ -336,7 +336,7 @@ def scoreboard(day=None):
     if day is None:
         day = gamedays[-1]
 
-    print gamedays
+    #print gamedays
 
     # for each group collect games of the chosen day:
     groups_and_games = {}
@@ -351,6 +351,6 @@ def scoreboard(day=None):
     #                 .join(Chassis)\
     #                 .order_by(Chassis.weight).all()
 
-    print groups_and_games
+    #print groups_and_games
 
     return render_template("scoreboard.html", display_gameday=day, gamedays=gamedays, inactive_gamedays=inactive_gamedays, groups_and_games=groups_and_games)
