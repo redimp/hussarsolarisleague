@@ -333,7 +333,7 @@ def scoreboard(day=None):
     inactive_gamedays = sorted(list(set([x.day for x in Game.query.filter(Game.status == 0).group_by(Game.day).all()])))
     group_ids = sorted(list(set([x.in_group for x in User.query.all()])))
     # pick last day
-    if day is None:
+    if day is None and gamedays:
         day = gamedays[-1]
 
     #print gamedays
