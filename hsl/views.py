@@ -342,7 +342,7 @@ def scoreboard(day=None):
     groups_and_games = {}
     for gid in group_ids:
         games = Game.query.join(User,Game.player_home_id==User.id)\
-            .filter(db.and_(Game.day==day,User.in_group == gid))\
+            .filter(Game.day==day,User.in_group == gid)\
             .order_by(User.username)\
             .all()
         groups_and_games[gid] = games
