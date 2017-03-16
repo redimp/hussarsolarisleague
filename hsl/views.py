@@ -401,7 +401,7 @@ def leaderboard():
 
         # sort scores and check if any score greater zero
         score = sorted(score.items(), key=operator.itemgetter(1), reverse=True)
-        if max(score, key=operator.itemgetter(1))[1] > 0.0:
+        if max(score, key=operator.itemgetter(1))[1][1] > 0.0:
             score_per_group[gid] = score
                 
     return render_template("leaderboard.html", score_per_group = score_per_group)
