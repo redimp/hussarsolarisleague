@@ -8,7 +8,9 @@
   <thead>
     <tr>
       <th style="text-align:left;">Player</th>
-      <th>Win/Loss</th>
+      <th style="text-align:center">Win/Loss</th>
+      <th style="text-align:center">Win</th>
+      <th style="text-align:center">Loss</th>
     </tr>
   </thead>
   <tbody>
@@ -19,9 +21,19 @@
 	{% else %}{{user}}
 	{% endif %}
       </td>
-      <td>
-	{% if g.user.username == user %}<strong>{{ '%1.2f' % ratio}}</strong>
-	{% else %}{{ '%1.2f' % ratio }}
+      <td style="text-align:center">
+	{% if g.user.username == user %}<strong>{{ '%1.2f' % ratio.0}}</strong>
+	{% else %}{{ '%1.2f' % ratio.0 }}
+	{% endif %}
+      </td>
+      <td style="text-align:center">
+	{% if g.user.username == user %}<strong>{{ '%1.2f' % ratio.1}}</strong>
+	{% else %}{{ '%1.2f' % ratio.1 }}
+	{% endif %}
+      </td>
+      <td style="text-align:center">
+	{% if g.user.username == user %}<strong>{{ '%1.2f' % ratio.2}}</strong>
+	{% else %}{{ '%1.2f' % ratio.2 }}
 	{% endif %}
       </td>
     </tr>

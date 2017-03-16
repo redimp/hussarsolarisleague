@@ -397,11 +397,11 @@ def leaderboard():
                 wlR = round(wlRatio[p.id].real/(wlRatio[p.id].real+wlRatio[p.id].imag), 2)
             except ZeroDivisionError:
                 wlR = 0.0
-            score[p.username] = wlR
-            
+            score[p.username] = (wlR, wlRatio[p.id].real, wlRatio[p.id].imag)
+
         # sort scores and check if any score greater zero
         score = sorted(score.items(), key=operator.itemgetter(1), reverse=True)
-        if max(score, key=operator.itemgetter(1))[1] > 0.0:
+        if max(score, key=operator.itemgetter(1))[1][1] > 0.0:
             score_per_group[gid] = score
                 
     return render_template("leaderboard.html", score_per_group = score_per_group)
