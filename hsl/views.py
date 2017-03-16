@@ -345,7 +345,8 @@ def scoreboard(day=None):
             .filter(Game.day==day,User.in_group == gid)\
             .order_by(User.username)\
             .all()
-        groups_and_games[gid] = games
+        if games:
+            groups_and_games[gid] = games
 
     #current_hangar = Hangar.query.filter_by(user_id=g.user.id)\
     #                 .join(Chassis)\
