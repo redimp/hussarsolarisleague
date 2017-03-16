@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Leaderboard</h2>
+{% if score_per_group %}
+{% for group,score in score_per_group.iteritems() %}
+<h3>Group {{group}}</h3>
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th style="text-align:left;">Player</th>
+      <th>Win/Loss</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for user,ratio in score %}
+    <tr>
+      <td>
+	{% if g.user.username == user %}<strong>{{user}}</strong>
+	{% else %}{{user}}
+	{% endif %}
+      </td>
+      <td>
+	{% if g.user.username == user %}<strong>{{ '%1.2f' % ratio}}</strong>
+	{% else %}{{ '%1.2f' % ratio }}
+	{% endif %}
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endfor %}
+{% else %}
+No leaderboard available at the moment. Please wait till the games have been played.
+{% endif %}
+
+{% endblock %}

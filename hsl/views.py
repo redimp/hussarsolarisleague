@@ -6,7 +6,7 @@ import hsl
 from hsl.models import User, Chassis, Hangar, Game, get_db_setting
 from hsl.rules import check_hangar_for_errors
 import random
-
+import operator
 
 @app.before_request
 def before_request():
@@ -326,6 +326,7 @@ def setup_hangar():
                            selected_trials=selected_trials,
                            everything_ok=everything_ok)
 
+
 @app.route('/scoreboard/<int:day>')
 @app.route('/scoreboard')
 def scoreboard(day=None):
@@ -356,3 +357,51 @@ def scoreboard(day=None):
 
     return render_template("scoreboard.html", display_gameday=day, gamedays=gamedays, inactive_gamedays=inactive_gamedays, groups_and_games=groups_and_games)
 
+
+def calculatePoints(wTonnage, lTonnage):
+    eps = 0.5
+    return 1.0 + (lTonnage - wTonnage)*eps / max(wTonnage, lTonnage)
+
+@app.route('/leaderboard')
+def leaderboard():
+    score_per_group = {}
+    group_ids = sorted(list(set([x.in_group for x in User.query.all()])))
+    for gid in group_ids:
+        finishedGames = Game.query.join(User, Game.player_home_id==User.id)\
+                        .filter(Game.status == 3, User.in_group == gid)\
+                        .all()
+        players = User.query.filter_by(in_group = gid).all()
+
+        # use complex numbers for addition
+        wlRatio = {}
+        for p in players:
+            wlRatio[p.id] = 0.0+0.0j
+
+        # sum up win/loss points
+        for game in finishedGames:
+            # home is winner
+            if game.winner == game.player_home_id:
+                pts = calculatePoints(game.mech_home.chassis.weight, game.mech_away.chassis.weight)
+                wlRatio[game.player_home_id] += complex(pts, 0.0)
+                wlRatio[game.player_away_id] += complex(0.0, pts)
+            # away is winner
+            else:
+                pts = calculatePoints(game.mech_away.chassis.weight, game.mech_home.chassis.weight)
+                wlRatio[game.player_away_id] += complex(pts, 0.0)
+                wlRatio[game.player_home_id] += complex(0.0, pts)
+        
+        # calculate win/loss ratio
+        score = {}
+        for p in players:
+            try:
+                wlR = round(wlRatio[p.id].real/(wlRatio[p.id].real+wlRatio[p.id].imag), 2)
+            except ZeroDivisionError:
+                wlR = 0.0
+            score[p.username] = wlR
+            
+        # sort scores and check if any score greater zero
+        score = sorted(score.items(), key=operator.itemgetter(1), reverse=True)
+        if max(score, key=operator.itemgetter(1))[1] > 0.0:
+            score_per_group[gid] = score
+                
+    return render_template("leaderboard.html", score_per_group = score_per_group)
