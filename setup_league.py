@@ -32,12 +32,13 @@ def fixtures(teams):
         rotation = [rotation[0]] + [rotation[-1]] + rotation[1:-1]
     return fixtures
 
-def get_user(name):
+def get_user(name, gid = 0):
     global chassisnames
     password = "%s%04i" % (random.choice(chassisname),random.randint(0,9999))
     print "%-24s\t%s" % (name, password)
     pwhash = bcrypt.hashpw(password.encode('utf8'),bcrypt.gensalt(12))
     user = User(name,pwhash,'')
+    user.in_group = gid
     db.session.add(user)
     db.session.commit()
     user = User.query.filter_by(username=name).first()
@@ -52,7 +53,7 @@ if __name__ == "__main__":
     parser.add_argument("files", help="One text file per group. One name per line.", type=str, nargs="+")
     args = parser.parse_args()
 
-    for filename in args.files:
+    for gid,filename in enumerate(args.files):
         with open(filename, 'r') as f:
             group_str = f.read().splitlines()
 
@@ -60,7 +61,7 @@ if __name__ == "__main__":
         
         for name in group_str:
             # create user
-            u = get_user(name)
+            u = get_user(name,gid+1)
             group.append(u)
 
         if len(group) < 0:
