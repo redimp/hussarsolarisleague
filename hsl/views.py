@@ -334,7 +334,7 @@ def scoreboard(day=None):
     inactive_gamedays = sorted(list(set([x.day for x in Game.query.filter(Game.status == 0).group_by(Game.day).all()])))
     group_ids = sorted(list(set([x.in_group for x in User.query.all()])))
     # pick last day
-    if day is None:
+    if day is None and gamedays:
         day = gamedays[-1]
 
     #print gamedays
@@ -343,10 +343,11 @@ def scoreboard(day=None):
     groups_and_games = {}
     for gid in group_ids:
         games = Game.query.join(User,Game.player_home_id==User.id)\
-            .filter(db.and_(Game.day==day,User.in_group == gid))\
+            .filter(Game.day==day,User.in_group == gid)\
             .order_by(User.username)\
             .all()
-        groups_and_games[gid] = games
+        if games:
+            groups_and_games[gid] = games
 
     #current_hangar = Hangar.query.filter_by(user_id=g.user.id)\
     #                 .join(Chassis)\

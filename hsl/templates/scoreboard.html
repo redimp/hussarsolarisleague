@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 {% block content %}
 <h2>Scoreboard</h2>
+{% if groups_and_games %}
 Day: {% for day in gamedays + inactive_gamedays %}
 {% if day == display_gameday %}
 <strong>{{day}}</strong>&nbsp;
@@ -42,5 +43,8 @@ Day: {% for day in gamedays + inactive_gamedays %}
     </tbody>
 </table>
 {% endfor %}
+{% else %}
+No scoreboard available at the moment. Please wait till the league has been started.
+{% endif %}
 
 {% endblock %}
