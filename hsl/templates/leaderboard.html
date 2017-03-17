@@ -8,9 +8,10 @@
   <thead>
     <tr>
       <th style="text-align:left;">Player</th>
-      <th style="text-align:center">Win/Loss</th>
-      <th style="text-align:center">Win</th>
-      <th style="text-align:center">Loss</th>
+      <th style="text-align:center;width:15%;">Win/Loss</th>
+      <th style="text-align:center;width:15%;">Win</th>
+      <th style="text-align:center;width:15%;">Loss</th>
+      <th style="text-align:center;width:15%;">Games</th>
     </tr>
   </thead>
   <tbody>
@@ -34,6 +35,11 @@
       <td style="text-align:center">
 	{% if g.user.username == user %}<strong>{{ '%1.2f' % ratio.2}}</strong>
 	{% else %}{{ '%1.2f' % ratio.2 }}
+	{% endif %}
+      </td>
+      <td style="text-align:center">
+	{% if g.user.username == user %}<strong>{{ ratio.3 }}</strong>
+	{% else %}{{ ratio.3 }}
 	{% endif %}
       </td>
     </tr>

@@ -374,11 +374,15 @@ def leaderboard():
 
         # use complex numbers for addition
         wlRatio = {}
+        NumberOfGames = {}
         for p in players:
             wlRatio[p.id] = 0.0+0.0j
+            NumberOfGames[p.id] = 0
 
         # sum up win/loss points
         for game in finishedGames:
+            NumberOfGames[game.player_home_id] += 1
+            NumberOfGames[game.player_away_id] += 1
             # home is winner
             if game.winner == game.player_home_id:
                 pts = calculatePoints(game.mech_home.chassis.weight, game.mech_away.chassis.weight)
@@ -397,7 +401,7 @@ def leaderboard():
                 wlR = round(wlRatio[p.id].real/(wlRatio[p.id].real+wlRatio[p.id].imag), 2)
             except ZeroDivisionError:
                 wlR = 0.0
-            score[p.username] = (wlR, wlRatio[p.id].real, wlRatio[p.id].imag)
+            score[p.username] = (wlR, wlRatio[p.id].real, wlRatio[p.id].imag, NumberOfGames[p.id])
 
         # sort scores and check if any score greater zero
         score = sorted(score.items(), key=operator.itemgetter(1), reverse=True)
