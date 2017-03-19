@@ -111,7 +111,9 @@
 <input type="submit" value="Update" />
 </div>
 {% endif %}
+{% if game.status < 2 %}
 <p style="font-size:small;"><strong>[1]</strong> You can only be ready in one game at a time.</p>
+{% endif %}
 </form>
 {# ready: {{request.form.ready}} mech: {{request.form.mech}} selected_winner: {{selected_winner}} #}
 
