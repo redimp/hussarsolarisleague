@@ -406,7 +406,7 @@ def leaderboard():
         score = {}
         for p in players:
             try:
-                wlR = round(wlRatio[p.id].real/(wlRatio[p.id].real+wlRatio[p.id].imag), 2)
+                wlR = wlRatio[p.id].real/(wlRatio[p.id].real+wlRatio[p.id].imag)
             except ZeroDivisionError:
                 wlR = 0.0
             score[p.username] = (wlR, wlRatio[p.id].real, wlRatio[p.id].imag, NumberOfGames[p.id])
