@@ -8,6 +8,14 @@ from hsl.rules import check_hangar_for_errors
 import random
 import operator
 
+def calculatePoints(wTonnage, lTonnage):
+    eps = 0.5
+    return 1.0 + (lTonnage - wTonnage)*eps / max(wTonnage, lTonnage)
+
+def calculateWinLoss(pTonnage, oTonnage):
+    return (calculatePoints(pTonnage, oTonnage), calculatePoints(oTonnage, pTonnage))
+
+
 @app.before_request
 def before_request():
     g.user = current_user
@@ -193,13 +201,10 @@ def game_detail(game_id):
     # shortcut
     home_team = g.user.id == current_game.player_home_id
 
+    # calculate possible points (win, loss)
     wlScore = (0.0, 0.0)
     if current_game.status >= 2:
-    # calculate possible points (win, loss)
-        wlScore = (calculatePoints(current_game.get_info()[2].weight,
-                                   current_game.get_opponent_info()[2].weight),
-                   calculatePoints(current_game.get_opponent_info()[2].weight,
-                                   current_game.get_info()[2].weight))
+        wlScore = calculateWinLoss(current_game.get_info()[2].weight, current_game.get_opponent_info()[2].weight)
 
     if home_team:
         selected_mech, ready = current_game.mech_home_id, current_game.ready_home
@@ -243,6 +248,9 @@ def game_detail(game_id):
                 # roll map
                 current_game.map = random.choice(Game.Maps)
                 hsl.logmsg("%s set to status 2 map: %s" % (current_game,current_game.map))
+                # calculate win/loss
+                wlScore = calculateWinLoss(current_game.get_info()[2].weight,
+                                           current_game.get_opponent_info()[2].weight)
                 # mark mechs as used
                 mechs = Hangar.query.filter(Hangar.id.in_([current_game.mech_away_id,current_game.mech_home_id])).all()
                 for m in mechs:
@@ -365,10 +373,6 @@ def scoreboard(day=None):
 
     return render_template("scoreboard.html", display_gameday=day, gamedays=gamedays, inactive_gamedays=inactive_gamedays, groups_and_games=groups_and_games)
 
-
-def calculatePoints(wTonnage, lTonnage):
-    eps = 0.5
-    return 1.0 + (lTonnage - wTonnage)*eps / max(wTonnage, lTonnage)
 
 @app.route('/leaderboard')
 def leaderboard():
