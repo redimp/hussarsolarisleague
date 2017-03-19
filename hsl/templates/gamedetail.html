@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% block content %}
-<h2><a href="{{ url_for('game_detail', game_id = game.id) }}">Game {{game.day}}  &nbsp; &ndash; &nbsp; 
-	<em>{{game.player_home.username}}</em> &nbsp; vs &nbsp; 
+<h2><a href="{{ url_for('game_detail', game_id = game.id) }}">Game {{game.day}}  &nbsp; &ndash; &nbsp;
+	<em>{{game.player_home.username}}</em> &nbsp; vs &nbsp;
 	<em>{{game.player_away.username}}</em> </h2></a>
 <form action="{{ url_for('game_detail', game_id = game.id) }}" method="post">
 <table class="table table-striped">
@@ -68,6 +68,11 @@
                 {% endif %}
             </td>
         </tr>
+	<tr>
+	  <th scope="row">Win/Loss</th>
+	  <td>{{ '%1.2f' % wlScore.0}}</td>
+	  <td>{{ '%1.2f' % wlScore.1}}</td>
+	</tr>
         <tr>
             <th scope="row">Map</th>
             <td colspan="2">{{ game.map }}</td>
@@ -86,14 +91,17 @@
         {% endif %}
         {% if game.status == 3 %}
         <tr>
-            <th scope="row">Result</th>
-            <td colspan="2">
-                {% if game.winner == g.user.id %}
-                <img src="/static/assets/img/Trophy-16.png" />
-                {% else %}
-                <img src="/static/assets/img/Thriller-16.png" />
-                {% endif %}
-                {{ game.get_status() }}</td>
+          <th scope="row">Result</th>
+	  <td colspan="2">
+	    {% set score = wlScore.0 %}
+	    {% if game.winner == g.user.id %}
+	    <img src="/static/assets/img/Trophy-16.png" />
+	    {% else %}
+	    {% set score = wlScore.1 %}
+	    <img src="/static/assets/img/Thriller-16.png" />
+	    {% endif %}
+	    {{ game.get_status() }} ({{'%1.2f' % score}})
+	  </td>
         </tr>
         {% endif %}
     </tbody>

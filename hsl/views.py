@@ -193,6 +193,14 @@ def game_detail(game_id):
     # shortcut
     home_team = g.user.id == current_game.player_home_id
 
+    wlScore = (0.0, 0.0)
+    if current_game.status >= 2:
+    # calculate possible points (win, loss)
+        wlScore = (calculatePoints(current_game.get_info()[2].weight,
+                                   current_game.get_opponent_info()[2].weight),
+                   calculatePoints(current_game.get_opponent_info()[2].weight,
+                                   current_game.get_info()[2].weight))
+
     if home_team:
         selected_mech, ready = current_game.mech_home_id, current_game.ready_home
         selected_winner = current_game.winner_home
@@ -271,7 +279,7 @@ def game_detail(game_id):
             ).join(Chassis).order_by(Chassis.weight, Chassis.name).all()
 
     return render_template("gamedetail.html", game=current_game, selected_winner=selected_winner,
-                           hangar=player_hangar, selected_mech=selected_mech, ready=ready)
+                           hangar=player_hangar, selected_mech=selected_mech, ready=ready, wlScore=wlScore)
 
 
 @app.route('/setup_hangar', methods=['GET', 'POST'])
