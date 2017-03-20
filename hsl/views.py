@@ -17,6 +17,11 @@ def calculatePoints(wTonnage, lTonnage):
 def calculateWinLoss(pTonnage, oTonnage):
     return (calculatePoints(pTonnage, oTonnage), calculatePoints(oTonnage, pTonnage))
 
+def hangar_update_required():
+    return Hangar.query.join(Chassis).filter(
+            Hangar.user_id == g.user.id,
+            Hangar.trial, Chassis.trial_available == 0
+            ).count() > 0
 
 @app.before_request
 def before_request():
@@ -172,14 +177,23 @@ def hangar():
     current_hangar = Hangar.query.filter_by(user_id=g.user.id)\
                      .join(Chassis)\
                      .order_by(Chassis.weight).all()
+    # check if a hangar exists
     if len(current_hangar) < 1:
         return redirect(url_for('setup_hangar'))
+    # check if a hangar update is required
+    if hangar_update_required():
+        return redirect(url_for('update_hangar'))
+
     return render_template("hangar.html", current_hangar=current_hangar)
 
 
 @app.route('/games', methods=['GET', 'POST'])
 @login_required
 def games():
+    # check if a hangar update is required
+    if hangar_update_required():
+        return redirect(url_for('update_hangar'))
+
     gamelist = Game.query.filter(
                 db.or_(Game.player_home_id == g.user.id,
                        Game.player_away_id == g.user.id)
@@ -194,6 +208,10 @@ def game_detail(game_id):
 
     if current_game is None:
         abort(404)
+
+    # check if a hangar update is required
+    if hangar_update_required():
+        return redirect(url_for('update_hangar'))
 
     # check permissions
     if g.user.id not in [current_game.player_home_id, current_game.player_away_id]:
@@ -433,7 +451,7 @@ def favicon():
 @app.route('/update_hangar', methods=['GET', 'POST'])
 @login_required
 def update_hangar():
-    # TODO: find disabled trials n hangar
+    # find disabled trials n hangar
     old_trials = Hangar.query.join(Chassis).filter(
             db.and_(Hangar.user_id == g.user.id,
                     Hangar.trial, Chassis.trial_available == 0)
