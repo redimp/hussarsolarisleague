@@ -428,3 +428,76 @@ def leaderboard():
 def favicon():
     return send_from_directory(os.path.join(app.root_path, 'static/assets/img'),
                                                'favicon.ico', mimetype='image/vnd.microsoft.icon')
+
+
+@app.route('/update_hangar', methods=['GET', 'POST'])
+@login_required
+def update_hangar():
+    # TODO: find disabled trials n hangar
+    old_trials = Hangar.query.join(Chassis).filter(
+            db.and_(Hangar.user_id == g.user.id,
+                    Hangar.trial, Chassis.trial_available == 0)
+                ).all()
+    if len(old_trials)<1:
+        flash("No hangar update available.","warning")
+        return redirect(url_for('hangar'))
+    # put trials in classes
+    trials_needed = { 'Light':[], 'Medium':[], 'Heavy':[], 'Assault':[] }
+    for t in old_trials:
+        trials_needed[t.chassis.weightclass].append(t)
+
+    # get a list of new trials
+    trials_available = { 'Light':[], 'Medium':[], 'Heavy':[], 'Assault':[] }
+    new_trials = Chassis.query.filter(Chassis.trial_available == 1).all()
+    for t in new_trials:
+        # check for collusion
+        collusions = Hangar.query.join(Chassis).filter(
+                db.and_(Hangar.user_id == g.user.id,
+                        Hangar.chassis_id == t.id)).count()
+        t.collusion = collusions>0
+
+        trials_available[t.weightclass].append(t)
+
+    selected_trials = list(set([int(x) for x in request.form.getlist("trial")]))
+
+    everything_ok = False
+
+    if len(selected_trials)>0:
+        error = None
+        trials = Chassis.query.filter(db.and_(Chassis.trial_available, Chassis.id.in_(selected_trials))).all()
+        # check if the selected trials are ok
+        for class_ in ['Light','Medium','Heavy','Assault']:
+            t = len([x for x in trials if x.weightclass == class_])
+            n = len(trials_needed[class_])
+            if (n > 0 and t == 0):
+                error = "You have to pick at least one %s Mech." % class_
+            if (t > n):
+                error = "You can only pick %i %s Mech." % (n,class_)
+        if error:
+            flash(error, 'error')
+        else:
+            everything_ok = True
+            if len(request.form.getlist("confirmed"))>0:
+                # set old trials to available = used
+                for m in old_trials:
+                    m.trial = False
+                    m.available = m.used
+                    db.session.add(m)
+                # add new selected trials
+                for m in trials:
+                    nm = Hangar(user_id=g.user.id, chassis_id=m.id, trial=True)
+                    # add new trial to hangar
+                    db.session.add(nm)
+                    collusions = Hangar.query.join(Chassis).filter(Hangar.user_id == g.user.id,
+                            Hangar.chassis_id == m.id).all()
+                    for mc in collusions:
+                        # disabled other variant
+                        mc.available = mc.used
+                        db.session.add(mc)
+                db.session.commit()
+                flash('Hangar updated.', 'success')
+                return redirect(url_for('hangar'))
+
+    return render_template("update_hangar.html", trials_needed=trials_needed, trials_available=trials_available, selected_trials=selected_trials, everything_ok=everything_ok)
+
+

@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Update Your Hangar</h2>
+<hr>
+<p>Due to the update of trial mechs you <strong>have to</strong> update your Hangar.</p>
+{%if everything_ok %}
+<ul class="flashes">
+  <li class="success">Everything looks fine, please re-check your Hangar and confirm it at the bottom of the page.</li>
+</ul>
+{%endif%}
+
+<form action="{{ url_for('update_hangar') }}" method="post">
+
+{%for class_ in ['Light','Medium','Heavy','Assault'] %}
+{%if trials_needed[class_]|length > 0%}
+<p>Please replace {% for m in trials_needed[class_] %} {{m.chassis.name}} {%if not loop.last%} and {%endif%} {% endfor %}in your hangar. You can choose <em>up to</em> {{trials_needed[class_]|length}} trials in the {{class_}} class.</p>
+<table class="table table-striped">
+<thead>
+<tr> <th>Chassis</th> <th style='width:20%;'>Weight</th> <th style='width:20%;'>Pick as Trial</th> </tr>
+</thead>
+<tbody>
+    {% for mech in trials_available[class_] %}
+    <tr><td>{{ mech.name }}{%if mech.collusion%}<span class="required"><sup>1</sup></span>{%endif%}</td><td>{{ mech.weight }}</td><td><input type="checkbox" name="trial" value="{{ mech.id }}" {%if mech.id in selected_trials%}checked{%endif%}></td></tr>
+    {% endfor %}
+</tbody>
+</table>
+{%endif%}
+{%endfor%}
+
+{% if everything_ok %}
+<ul class="flashes">
+  <li class="success">I know what i'm doing. <input type="checkbox" name="confirmed" value="confirmed"></li>
+</ul>
+
+{% endif %}
+<div class="form-style-2">
+<input type="submit" value="Submit" />
+</div>
+</form>
+<p><span class="required"><sup>1</sup></span>: Warning: You have this chassis as non trial in your hangar. If you pick it, your other mech will not be available anymore.</p>
+{% endblock %}

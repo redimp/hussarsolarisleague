@@ -68,6 +68,9 @@ class Chassis(db.Model):
     weightclass = db.Column('class', db.Enum('Light','Medium','Heavy','Assault'))
     trial_available = db.Column('trial_available', db.Boolean, default=False)
 
+    def __repr__(self):
+        return '<Chassis #%i %s>' % (self.id, self.name)
+
 
 class Hangar(db.Model):
     __tablename__ = "hangar"
