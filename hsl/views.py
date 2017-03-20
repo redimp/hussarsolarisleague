@@ -237,6 +237,10 @@ def game_detail(game_id):
                 ready = False
             if ready:
                 m = Hangar.query.filter_by(id = selected_mech).first()
+                if m.trial and selected_variant != "TRIAL":
+                    ready = False
+                    selected_variant = 'TRIAL'
+                    flash('You can only pick the TRIAL variant.')
                 if not m.trial:
                     variant_check = Variant.query.filter_by(name=selected_variant, chassis_id = m.chassis_id).first()
                     if variant_check is None:
