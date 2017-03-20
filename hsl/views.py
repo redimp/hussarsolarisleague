@@ -316,10 +316,10 @@ def game_detail(game_id):
     variants = None
     if selected_mech is not None:
         m = Hangar.query.filter_by(id = selected_mech).first()
-        if m.trial:
+        if m is not None and m.trial:
             variants = ["TRIAL"]
             selected_variant = variants[0]
-        else:
+        elif m is not None:
             variants = [x.name for x in Variant.query.filter_by(chassis_id = m.chassis_id).all()]
 
     return render_template("gamedetail.html", game=current_game, selected_winner=selected_winner,
