@@ -64,8 +64,10 @@ def register():
     if app.config['TEST_MODE']:
         # mechs of test user 1
         test_mechs = []
+        test_variants = {}
         for x in Hangar.query.filter_by(user_id=1).all():
             test_mechs.append(x.id)
+            test_variants[x.id] = [y.name for y in Variant.query.filter_by(chassis_id = x.chassis_id).all()]
 
         # create test games
         for x in xrange(4):
@@ -81,6 +83,7 @@ def register():
             home_game.winner_away = user.id
             home_game.mech_home_id = None
             home_game.mech_away_id = random.choice(test_mechs)
+            home_game.variant_away = random.choice(test_variants[home_game.mech_away_id])
             home_game.status = 1
             db.session.add(home_game)
             # rueckspiel
@@ -94,6 +97,7 @@ def register():
             away_game.winner_home = 1
             away_game.winner_away = None
             away_game.mech_home_id = random.choice(test_mechs)
+            away_game.variant_home = random.choice(test_variants[away_game.mech_home_id])
             away_game.mech_away_id = None
             away_game.status = 1
             db.session.add(away_game)
