@@ -378,7 +378,7 @@ Wide styles
     padding-top: 8px;
     padding-right: 5px;
 }
-.form-style-2 span.required{
+span.required{
     color:red;
 }
 .form-style-2 .tel-number-field{
@@ -439,3 +439,4 @@ Wide styles
 tr.light, tr.heavy {
 background-color: #efefef;
 }
+
