@@ -1,12 +1,14 @@
 from hsl import app, db
 from flask import render_template, request, session, request, \
-                  flash, url_for, redirect, render_template, abort, g
+                  flash, url_for, redirect, render_template, abort, g, \
+                  send_from_directory
 from flask_login import login_user, logout_user, current_user, login_required
 import hsl
 from hsl.models import User, Chassis, Hangar, Game, get_db_setting
 from hsl.rules import check_hangar_for_errors
 import random
 import operator
+import os
 
 def calculatePoints(wTonnage, lTonnage):
     eps = 0.5
@@ -421,3 +423,8 @@ def leaderboard():
             score_per_group[gid] = score
                 
     return render_template("leaderboard.html", score_per_group = score_per_group)
+
+@app.route('/favicon.ico')
+def favicon():
+    return send_from_directory(os.path.join(app.root_path, 'static/assets/img'),
+                                               'favicon.ico', mimetype='image/vnd.microsoft.icon')
