@@ -503,15 +503,15 @@ def update_hangar():
                     db.session.add(m)
                 # add new selected trials
                 for m in trials:
-                    nm = Hangar(user_id=g.user.id, chassis_id=m.id, trial=True)
-                    # add new trial to hangar
-                    db.session.add(nm)
                     collusions = Hangar.query.join(Chassis).filter(Hangar.user_id == g.user.id,
                             Hangar.chassis_id == m.id).all()
                     for mc in collusions:
                         # disabled other variant
                         mc.available = mc.used
                         db.session.add(mc)
+                    nm = Hangar(user_id=g.user.id, chassis_id=m.id, trial=True)
+                    # add new trial to hangar
+                    db.session.add(nm)
                 db.session.commit()
                 flash('Hangar updated.', 'success')
                 return redirect(url_for('hangar'))
