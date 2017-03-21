@@ -504,7 +504,7 @@ def update_hangar():
                 # add new selected trials
                 for m in trials:
                     collusions = Hangar.query.join(Chassis).filter(Hangar.user_id == g.user.id,
-                            Hangar.chassis_id == m.id).all()
+                            Hangar.chassis_id == m.id, trial == False).all()
                     for mc in collusions:
                         # disabled other variant
                         mc.available = mc.used
