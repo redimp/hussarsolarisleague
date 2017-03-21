@@ -469,11 +469,13 @@ def update_hangar():
     new_trials = Chassis.query.filter(Chassis.trial_available == 1).all()
     for t in new_trials:
         # check for collusion
-        collusions = Hangar.query.join(Chassis).filter(
+        collusion = Hangar.query.join(Chassis).filter(
                 db.and_(Hangar.user_id == g.user.id,
-                        Hangar.chassis_id == t.id)).count()
-        t.collusion = collusions>0
-
+                        Hangar.chassis_id == t.id)).first()
+        if collusion is not None and collusion.trial:
+            continue
+        elif collusion is not None and not collusion.trial:
+            t.collusion = True
         trials_available[t.weightclass].append(t)
 
     selected_trials = list(set([int(x) for x in request.form.getlist("trial")]))
