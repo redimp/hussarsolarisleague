@@ -60,6 +60,7 @@ class Setting(db.Model):
         self.name = name
         self.value = value
 
+
 class Chassis(db.Model):
     __tablename__ = "chassis"
     id = db.Column('id', db.Integer, primary_key=True)
@@ -67,6 +68,14 @@ class Chassis(db.Model):
     weight = db.Column('weight', db.Integer)
     weightclass = db.Column('class', db.Enum('Light','Medium','Heavy','Assault'))
     trial_available = db.Column('trial_available', db.Boolean, default=False)
+
+
+class Variant(db.Model):
+    __tablename__ = "variant"
+    id = db.Column('id', db.Integer, primary_key=True)
+    name = db.Column('name', db.String(64), unique=True)
+    chassis_id = db.Column('chassis_id',db.Integer, db.ForeignKey('chassis.id'))
+    chassis = db.relationship('Chassis', foreign_keys=chassis_id)
 
 
 class Hangar(db.Model):
@@ -112,6 +121,8 @@ class Game(db.Model):
     winner_away = db.Column('winner_away', db.Integer, db.ForeignKey('user.id'), nullable=True)
     mech_home_id = db.Column('mech_home_id', db.Integer, db.ForeignKey('hangar.id'), nullable=True)
     mech_away_id = db.Column('mech_away_id', db.Integer, db.ForeignKey('hangar.id'), nullable=True)
+    variant_home = db.Column('variant_home', db.String(24), nullable=True)
+    variant_away = db.Column('variant_away', db.String(24), nullable=True)
     map = db.Column('map', db.String(24), nullable=True)
     status = db.Column('status', db.Integer, nullable=False, default=0)
     # Relationships
@@ -131,15 +142,23 @@ class Game(db.Model):
 
     def get_opponent_info(self):
         if self.player_home_id == g.user.id:
-            return (self.ready_away, self.mech_away_id, self.mech_away.chassis if self.mech_away else "", self.player_away)
+            return (self.ready_away, self.mech_away_id,
+                    self.mech_away.chassis if self.mech_away else "", self.player_away,
+                    self.variant_away)
         else:
-            return (self.ready_home, self.mech_home_id, self.mech_home.chassis if self.mech_home else "", self.player_home)
+            return (self.ready_home, self.mech_home_id,
+                    self.mech_home.chassis if self.mech_home else "", self.player_home,
+                    self.variant_home)
 
     def get_info(self):
         if self.player_home_id == g.user.id:
-            return (self.ready_home, self.mech_home_id, self.mech_home.chassis if self.mech_home else "")
+            return (self.ready_home, self.mech_home_id,
+                    self.mech_home.chassis if self.mech_home else "",
+                    self.variant_home)
         else:
-            return (self.ready_away, self.mech_away_id, self.mech_away.chassis if self.mech_away else "")
+            return (self.ready_away, self.mech_away_id,
+                    self.mech_away.chassis if self.mech_away else "",
+                    self.variant_away)
 
     def __repr__(self):
         return '<Game #%i %s vs %s>' % (self.id, self.player_home.username, self.player_away.username)

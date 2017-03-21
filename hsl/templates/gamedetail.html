@@ -49,6 +49,20 @@
             <td>&nbsp;...</td>
         </tr>
         <tr>
+            <th scope="row">Variant</th>
+            <td>
+                {%if variants %}
+            <select style="min-width:100%;" size="1" name="variant"{% if ready %}disabled{% endif %}><option value="">Choose a Variant</option>
+                    {% for variant in variants %}
+                    <option value="{{ variant }}" {% if selected_variant == variant %}selected{% endif %}>{{ variant }}</option>
+                    {% endfor %}
+                {%else%}
+                <em>Please choose a Mech.</em>
+                {%endif%}
+            </td>
+            <td>&nbsp;...</td>
+        </tr>
+        <tr>
             <th scope="row">Map</th>
             <td colspan="2" style="text-align:center;"><em>Map will be displayed when both players have choosen their mechs</em></td>
         </tr>
@@ -65,6 +79,16 @@
                 {{ game.get_opponent_info()[2].weight }}
                 {% else %}
                 {{ game.get_opponent_info()[2].name }} ({{ game.get_opponent_info()[2].weight }})
+                {% endif %}
+            </td>
+        </tr>
+        <tr>
+            <th scope="row">Variant</th>
+            <td>{{ game.get_info()[3] }}</td>
+            <td>{% if game.status == 2 %}
+                &nbsp;
+                {% else %}
+                {{ game.get_opponent_info()[4] }}
                 {% endif %}
             </td>
         </tr>

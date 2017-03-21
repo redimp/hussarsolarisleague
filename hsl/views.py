@@ -4,7 +4,7 @@ from flask import render_template, request, session, request, \
                   send_from_directory
 from flask_login import login_user, logout_user, current_user, login_required
 import hsl
-from hsl.models import User, Chassis, Hangar, Game, get_db_setting
+from hsl.models import User, Chassis, Hangar, Game, get_db_setting, Variant
 from hsl.rules import check_hangar_for_errors
 import random
 import operator
@@ -64,8 +64,10 @@ def register():
     if app.config['TEST_MODE']:
         # mechs of test user 1
         test_mechs = []
+        test_variants = {}
         for x in Hangar.query.filter_by(user_id=1).all():
             test_mechs.append(x.id)
+            test_variants[x.id] = [y.name for y in Variant.query.filter_by(chassis_id = x.chassis_id).all()]
 
         # create test games
         for x in xrange(4):
@@ -81,6 +83,7 @@ def register():
             home_game.winner_away = user.id
             home_game.mech_home_id = None
             home_game.mech_away_id = random.choice(test_mechs)
+            home_game.variant_away = random.choice(test_variants[home_game.mech_away_id])
             home_game.status = 1
             db.session.add(home_game)
             # rueckspiel
@@ -94,6 +97,7 @@ def register():
             away_game.winner_home = 1
             away_game.winner_away = None
             away_game.mech_home_id = random.choice(test_mechs)
+            away_game.variant_home = random.choice(test_variants[away_game.mech_home_id])
             away_game.mech_away_id = None
             away_game.status = 1
             db.session.add(away_game)
@@ -211,9 +215,11 @@ def game_detail(game_id):
     if home_team:
         selected_mech, ready = current_game.mech_home_id, current_game.ready_home
         selected_winner = current_game.winner_home
+        selected_variant = current_game.variant_home
     else:
         selected_mech, ready = current_game.mech_away_id, current_game.ready_away
         selected_winner = current_game.winner_away
+        selected_variant = current_game.variant_away
 
     #print g.user, current_game, "Form", request.form, "ready", ready
 
@@ -221,10 +227,27 @@ def game_detail(game_id):
         if current_game.status == 1:
             # Ready to begin
             selected_mech = int(request.form.get('mech') or 0)
+            selected_variant = str(request.form.get('variant'))
             ready = True if request.form.getlist('ready') else False
             if ready and selected_mech == 0:
                 flash('You have to select a mech to ready up.', 'warning')
                 ready = False
+            if ready and selected_variant in ["", None]:
+                flash('You have to select a variant to ready up.', 'warning')
+                ready = False
+            if ready:
+                m = Hangar.query.filter_by(id = selected_mech).first()
+                if m.trial and selected_variant != "TRIAL":
+                    ready = False
+                    selected_variant = 'TRIAL'
+                    flash('You can only pick the TRIAL variant.')
+                if not m.trial:
+                    variant_check = Variant.query.filter_by(name=selected_variant, chassis_id = m.chassis_id).first()
+                    if variant_check is None:
+                        flash('You selected an invalid variant.')
+                        selected_variant = ''
+                        ready = False
+
             if ready:
                 # mark all other games as unready
                 other_games = Game.query.filter(Game.id != current_game.id, Game.player_home_id == g.user.id, Game.status == 1).all()
@@ -240,9 +263,11 @@ def game_detail(game_id):
             if home_team:
                 current_game.ready_home = ready
                 current_game.mech_home_id = selected_mech
+                current_game.variant_home = selected_variant
             else:
                 current_game.ready_away = ready
                 current_game.mech_away_id = selected_mech
+                current_game.variant_away = selected_variant
 
             if current_game.ready_home and current_game.ready_away:
                 # update status
@@ -288,8 +313,18 @@ def game_detail(game_id):
                 )
             ).join(Chassis).order_by(Chassis.weight, Chassis.name).all()
 
+    variants = None
+    if selected_mech is not None:
+        m = Hangar.query.filter_by(id = selected_mech).first()
+        if m is not None and m.trial:
+            variants = ["TRIAL"]
+            selected_variant = variants[0]
+        elif m is not None:
+            variants = [x.name for x in Variant.query.filter_by(chassis_id = m.chassis_id).all()]
+
     return render_template("gamedetail.html", game=current_game, selected_winner=selected_winner,
-                           hangar=player_hangar, selected_mech=selected_mech, ready=ready, wlScore=wlScore)
+                           hangar=player_hangar, selected_mech=selected_mech, ready=ready, wlScore=wlScore,
+                           selected_variant=selected_variant, variants=variants)
 
 
 @app.route('/setup_hangar', methods=['GET', 'POST'])
