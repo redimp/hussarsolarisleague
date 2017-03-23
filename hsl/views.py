@@ -555,4 +555,4 @@ def update_hangar():
 
     return render_template("update_hangar.html", trials_needed=trials_needed, trials_available=trials_available, selected_trials=selected_trials, everything_ok=everything_ok)
 
-
+# vim:set sts=2 ts=2 tw=78 sw=2 et ai:
