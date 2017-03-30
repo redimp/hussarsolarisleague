@@ -175,12 +175,47 @@ def logout():
     return redirect(url_for('index'))
 
 
+def fetch_available_chassis(user_id):
+  hangar = Hangar.query.filter(
+            db.and_(Hangar.user_id == user_id)
+            ).join(Chassis).order_by(Chassis.weight, Chassis.name).all()
+  used = {'Light':0, 'Medium':0, 'Heavy':0, 'Assault':0}
+  avail = {'Light':0, 'Medium':0, 'Heavy':0, 'Assault':0}
+  non_trial_avail = {'Light':0, 'Medium':0, 'Heavy':0, 'Assault':0}
+  # first round, count everything
+  for x in hangar:
+    used[x.chassis.weightclass] += x.used
+    avail[x.chassis.weightclass] += x.available
+    if not x.trial:
+      non_trial_avail[x.chassis.weightclass] += (x.available-x.used)
+  # second round, check if mech is available
+  available_hangar = []
+  for x in hangar:
+    # if x is not a trial and is not used up
+    if not x.trial and x.used < x.available and used[x.chassis.weightclass] < 5:
+      available_hangar.append(x)
+    # if x is a trial, check if there are other chassis that have to be used
+    if x.trial and \
+      (5 - used[x.chassis.weightclass] -
+          non_trial_avail[x.chassis.weightclass])>0:
+        available_hangar.append(x)
+
+  return available_hangar
+
+@app.route('/available_chassis', methods=['GET', 'POST'])
+@login_required
+def available_chassis():
+  player_hangar = fetch_available_chassis(g.user.id)
+
+  return "%s" % player_hangar, 200, {'Content-Type' : 'text/plain' }
+
 @app.route('/hangar', methods=['GET', 'POST'])
 @login_required
 def hangar():
     current_hangar = Hangar.query.filter_by(user_id=g.user.id)\
                      .join(Chassis)\
                      .order_by(Chassis.weight).all()
+    available_hangar_id = [x.id for x in fetch_available_chassis(g.user.id)]
     # check if a hangar exists
     if len(current_hangar) < 1:
         return redirect(url_for('setup_hangar'))
@@ -188,7 +223,8 @@ def hangar():
     if hangar_update_required():
         return redirect(url_for('update_hangar'))
 
-    return render_template("hangar.html", current_hangar=current_hangar)
+    return render_template("hangar.html", current_hangar=current_hangar,
+        available_hangar=available_hangar_id)
 
 
 @app.route('/games', methods=['GET', 'POST'])
@@ -325,11 +361,12 @@ def game_detail(game_id):
                 db.session.add(current_game)
                 db.session.commit()
 
-    player_hangar = Hangar.query.filter(
-            db.and_(Hangar.user_id == g.user.id,
-                    db.or_(Hangar.available > Hangar.used, Hangar.trial)
-                )
-            ).join(Chassis).order_by(Chassis.weight, Chassis.name).all()
+    # player_hangar = Hangar.query.filter(
+    #         db.and_(Hangar.user_id == g.user.id,
+    #                 db.or_(Hangar.available > Hangar.used, Hangar.trial)
+    #             )
+    #         ).join(Chassis).order_by(Chassis.weight, Chassis.name).all()
+    player_hangar = fetch_available_chassis(g.user.id)
 
     variants = None
     if selected_mech is not None:

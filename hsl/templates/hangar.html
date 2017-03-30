@@ -17,7 +17,7 @@
             <th scope="row">{{loop.index}}</th>
             <td>{{mech.chassis.name}}</td>
             <td>{{mech.used}}</td>
-            <td>{% if mech.is_available() %}
+            <td>{% if mech.id in available_hangar %}
                     {% if mech.trial %}
                         <img alt="Yes, Trial Mech" title="Yes, Trial Mech" src="/static/assets/img/Puzzle-16.png" />
                     {%else%}
