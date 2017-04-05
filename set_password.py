@@ -41,5 +41,8 @@ if __name__ == "__main__":
         user.set_password(password)
         db.session.add(user)
         db.session.commit()
-        print "Password updated."
+        if args.password:
+            print "Password updated."
+        else:
+            print "New password:", password
 
