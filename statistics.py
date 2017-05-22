@@ -55,4 +55,17 @@ scorePerTonnage = sorted(scorePerTonnage.items(), key=operator.itemgetter(1), re
 
 print "\nTonnage\t\tWin/Loss\tWin\tLoss"
 for tonnage, value in scorePerTonnage:
-    print "%4d\t\t%6.2f\t\t%2d\t%3d" % (tonnage, value[0], value[1], value[2])
+    print "%3d\t\t%6.2f\t\t%2d\t%3d" % (tonnage, value[0], value[1], value[2])
+
+weightseen = {}
+for user in User.query.all():
+    game_home = Game.query.filter_by(status=3,player_home_id = user.id).all()
+    weights = [game.mech_away.chassis.weight for game in game_home]
+    game_away = Game.query.filter_by(status=3,player_away_id = user.id).all()
+    weights += [game.mech_home.chassis.weight for game in game_home]
+    if len(weights) > 0:
+        weightseen[user.username] = sum(weights)
+
+print "\n%-20s %s" % ("Player", "Enemy Tonnage")
+for x in sorted(weightseen.items(), key=operator.itemgetter(1), reverse=True):
+    print "%-20s %4i" % x
