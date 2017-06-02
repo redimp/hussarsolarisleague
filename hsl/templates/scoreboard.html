@@ -18,26 +18,34 @@ Day: {% for day in gamedays + inactive_gamedays %}
 <table class="table table-striped">
     <thead>
         <tr>
-            <th style="width:20%;">&nbsp;</th>
-            <th style="text-align:right;width:40%;">Home</th>
-            <th style="text-align:left;width:40%;">Away</th>
+            <th style="width:30%;" colspan="2">&nbsp;</th>
+            <th style="text-align:right;width:30%;">Home</th>
+            <th style="text-align:left;width:30%;">Away</th>
         </tr>
     </thead>
     <tbody>
         {% for game in games %}
         <tr>
             <td>{%if not game.winner %}<img src="/static/assets/img/Clock-16.png" />{%else%}&nbsp;{%endif%}</td>
+            <td class="small">{{game.map}}</td>
             <td style="text-align:right;">{%if game.winner == game.player_home_id%} <img src="/static/assets/img/Trophy-16.png" />{%endif%} 
-            {%if g.user == game.player_home %}<strong>{{game.player_home.username}}</strong>
+                {%if g.user == game.player_home %}<strong>{{game.player_home.username}}</strong>
             {%else%}{{game.player_home.username}}
             {%endif%}
-        </td>
+            {%if config.SCORE_DETAILS %}
+            <br/><span class="small">{{game.mech_home.chassis.name}} <i>{{game.variant_home if game.variant_home is not none else ''}}</i></span>
+            {%endif%}
+            </td>
             <td style="text-align:left;">
             {%if g.user == game.player_away %}<strong>{{game.player_away.username}}</strong>
             {%else%}
             {{game.player_away.username}}
             {%endif%}
-            {%if game.winner == game.player_away_id%} <img src="/static/assets/img/Trophy-16.png" />{%endif%}</td>
+            {%if game.winner == game.player_away_id%} <img src="/static/assets/img/Trophy-16.png" />{%endif%}
+            {%if config.SCORE_DETAILS %}
+            <span class="small"><br/>{{game.mech_away.chassis.name}} <i>{{game.variant_away if game.variant_away is not none else ''}}</i></span>
+            {%endif%}
+            </td>
         </tr>
         {% endfor %}
     </tbody>
