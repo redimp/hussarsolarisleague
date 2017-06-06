@@ -47,7 +47,7 @@ for game in games:
         wlPerTonnage[game.mech_away.chassis.weight] += complex(1.0, 0.0)
         wlPerTonnage[game.mech_home.chassis.weight] += complex(0.0, 1.0)
 
-scorePerTonnage = dict.fromkeys(range(20,101,5), (0.0, 0.0, 0.0, 0.0))
+scorePerTonnage = dict.fromkeys(range(20,101,5), (0.0, 0.0, 0.0))
 for tonnage, value in wlPerTonnage.iteritems():
     if abs(value) > 0.0:
         scorePerTonnage[tonnage] = (value.real/(value.real+value.imag), value.real, value.imag)
@@ -57,15 +57,22 @@ print "\nTonnage\t\tWin/Loss\tWin\tLoss"
 for tonnage, value in scorePerTonnage:
     print "%3d\t\t%6.2f\t\t%2d\t%3d" % (tonnage, value[0], value[1], value[2])
 
-weightseen = {}
+weightsAll = {}
 for user in User.query.all():
+    # user is home
     game_home = Game.query.filter_by(status=3,player_home_id = user.id).all()
-    weights = [game.mech_away.chassis.weight for game in game_home]
-    game_away = Game.query.filter_by(status=3,player_away_id = user.id).all()
-    weights += [game.mech_home.chassis.weight for game in game_home]
-    if len(weights) > 0:
-        weightseen[user.username] = sum(weights)
+    weightsOwn = [game.mech_home.chassis.weight for game in game_home]
+    weightsEnemy = [game.mech_away.chassis.weight for game in game_home]
 
-print "\n%-20s %s" % ("Player", "Enemy Tonnage")
-for x in sorted(weightseen.items(), key=operator.itemgetter(1), reverse=True):
-    print "%-20s %4i" % x
+    # user is away
+    game_away = Game.query.filter_by(status=3,player_away_id = user.id).all()
+    weightsOwn += [game.mech_away.chassis.weight for game in game_away]
+    weightsEnemy += [game.mech_home.chassis.weight for game in game_home]
+    if len(weightsOwn) > 0 and len(weightsEnemy) > 0:
+        weightsAll[user.username] = (sum(weightsOwn), sum(weightsEnemy))
+
+weightsAll = sorted(weightsAll.items(), key=operator.itemgetter(0), reverse=False)
+
+print "\n%-20s\t%s\t%s\t\t%s" % ("Player", "Tonnage (own)", "Tonnage (enemy)", "Difference")
+for user, value in weightsAll:
+    print "%-20s\t%8d\t%8d\t\t%+6d" % (user, value[0], value[1], value[1]-value[0])
