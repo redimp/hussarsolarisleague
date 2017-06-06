@@ -3,7 +3,7 @@
 import os
 import sys
 import operator
-from hsl.models import Game, User, Hangar
+from hsl.models import Game, User, Hangar, Chassis
 from hsl import db
 
 users_total = User.query.count()
@@ -47,16 +47,17 @@ for game in games:
         wlPerTonnage[game.mech_away.chassis.weight] += complex(1.0, 0.0)
         wlPerTonnage[game.mech_home.chassis.weight] += complex(0.0, 1.0)
 
-scorePerTonnage = dict.fromkeys(range(20,101,5), (0.0, 0.0, 0.0))
+scorePerTonnage = dict.fromkeys(range(20,101,5), (0.0, 0.0, 0.0, 0.0))
 for tonnage, value in wlPerTonnage.iteritems():
     if abs(value) > 0.0:
-        scorePerTonnage[tonnage] = (value.real/(value.real+value.imag), value.real, value.imag)
+        scorePerTonnage[tonnage] = (value.real/(value.real+value.imag), value.real, value.imag, value.real+value.imag)
 scorePerTonnage = sorted(scorePerTonnage.items(), key=operator.itemgetter(1), reverse=True)
 
-print "\nTonnage\t\tWin/Loss\tWin\tLoss"
+print "\nTonnage\t\tWin/Loss\tWin\tLoss\tUsage"
 for tonnage, value in scorePerTonnage:
-    print "%3d\t\t%6.2f\t\t%2d\t%3d" % (tonnage, value[0], value[1], value[2])
+    print "%3d\t\t%6.2f\t\t%2d\t%3d\t%3d" % (tonnage, value[0], value[1], value[2], value[3])
 
+# total weights per user
 weightsAll = {}
 for user in User.query.all():
     # user is home
@@ -76,3 +77,36 @@ weightsAll = sorted(weightsAll.items(), key=operator.itemgetter(0), reverse=Fals
 print "\n%-20s\t%s\t%s\t\t%s" % ("Player", "Tonnage (own)", "Tonnage (enemy)", "Difference")
 for user, value in weightsAll:
     print "%-20s\t%8d\t%8d\t\t%+6d" % (user, value[0], value[1], value[1]-value[0])
+
+# win/loss per chassis
+games = Game.query.filter_by(status=3).all()
+
+wlPerChassis = {}
+scorePerChassis = {}
+for mech in Chassis.query.all():
+    wlPerChassis[mech.name] = complex(0.0, 0.0)
+    scorePerChassis[mech.name] = (0.0, 0.0, 0.0, 0.0)
+    
+for game in games:
+    # home is winner
+    if game.winner == game.player_home_id:
+        wlPerChassis[game.mech_home.chassis.name] += complex(1.0, 0.0)
+        wlPerChassis[game.mech_away.chassis.name] += complex(0.0, 1.0)
+    # away is winner
+    else:
+        wlPerChassis[game.mech_away.chassis.name] += complex(1.0, 0.0)
+        wlPerChassis[game.mech_home.chassis.name] += complex(0.0, 1.0)
+
+for mech, value in wlPerChassis.iteritems():
+    if abs(value) > 0.0:
+        scorePerChassis[mech] = (value.real/(value.real+value.imag), value.real, value.imag, value.real+value.imag)
+scorePerChassis = sorted(scorePerChassis.items(), key=operator.itemgetter(1), reverse=True)
+
+print "\nMech\t\t\tWin/Loss\tWin\tLoss\tUsage"
+for mech, value in scorePerChassis:
+    print "%-15s\t\t%6.2f\t\t%2d\t%3d\t%3d" % (mech, value[0], value[1], value[2], value[3])
+
+
+
+        
+        
