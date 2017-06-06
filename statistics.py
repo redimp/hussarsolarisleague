@@ -6,6 +6,16 @@ import operator
 from hsl.models import Game, User, Hangar, Chassis
 from hsl import db
 
+def calculateWeightClass(tonnage):
+    if 20 <= tonnage <= 35:
+        return 0
+    elif 40 <= tonnage <= 55:
+        return 1
+    elif 60 <= tonnage <= 75:
+        return 2
+    elif 80 <= tonnage <= 100:
+        return 3
+
 users_total = User.query.count()
 
 users_with_hangar = Hangar.query\
@@ -58,15 +68,23 @@ for user, value in weightsAll:
 # win/loss ratio per tonnage
 games = Game.query.filter_by(status=3).all()
 wlPerTonnage = dict.fromkeys(range(20,101,5), 0.0+0.0j)
+wcMatrix = [[0 for x in range(4)] for y in range(4)] # weightclass Matrix
+wMatrix = [[0 for x in range(17)] for y in range(17)] # weight Matrix
 for game in games:
+    weightHome = game.mech_home.chassis.weight
+    weightAway = game.mech_away.chassis.weight
     # home is winner
     if game.winner == game.player_home_id:
-        wlPerTonnage[game.mech_home.chassis.weight] += complex(1.0, 0.0)
-        wlPerTonnage[game.mech_away.chassis.weight] += complex(0.0, 1.0)
+        wlPerTonnage[weightHome] += complex(1.0, 0.0)
+        wlPerTonnage[weightAway] += complex(0.0, 1.0)
+        wcMatrix[calculateWeightClass(weightHome)][calculateWeightClass(weightAway)] += 1
+        wMatrix[weightHome/5-4][weightAway/5-4] += 1
     # away is winner
     else:
-        wlPerTonnage[game.mech_away.chassis.weight] += complex(1.0, 0.0)
-        wlPerTonnage[game.mech_home.chassis.weight] += complex(0.0, 1.0)
+        wlPerTonnage[weightAway] += complex(1.0, 0.0)
+        wlPerTonnage[weightHome] += complex(0.0, 1.0)
+        wcMatrix[calculateWeightClass(weightAway)][calculateWeightClass(weightHome)] += 1
+        wMatrix[weightAway/5-4][weightHome/5-4] += 1
 
 scorePerTonnage = dict.fromkeys(range(20,101,5), (0.0, 0.0, 0.0, 0.0))
 for tonnage, value in wlPerTonnage.iteritems():
@@ -138,3 +156,14 @@ scorePerClass = sorted(scorePerClass.items(), key=operator.itemgetter(1), revers
 print "\nClass\t\t\tWin/Loss\tWin\tLoss\tUsage"
 for weightclass, value in scorePerClass:
     print "%-15s\t\t%6.2f\t\t%2d\t%3d\t%3d" % (weightclass, value[0], value[1], value[2], value[3])
+
+# print weight class matrix
+print "\nweight class matrix"
+for row in wcMatrix:
+    print " ".join(map(str,row))
+
+# print weight matrix
+print "\nweight matrix"
+for row in wMatrix:
+    print " ".join(map(str,row)) 
+
