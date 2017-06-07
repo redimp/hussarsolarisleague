@@ -3,8 +3,18 @@
 import os
 import sys
 import operator
-from hsl.models import Game, User, Hangar
+from hsl.models import Game, User, Hangar, Chassis
 from hsl import db
+
+def calculateWeightClass(tonnage):
+    if 20 <= tonnage <= 35:
+        return 0
+    elif 40 <= tonnage <= 55:
+        return 1
+    elif 60 <= tonnage <= 75:
+        return 2
+    elif 80 <= tonnage <= 100:
+        return 3
 
 users_total = User.query.count()
 
@@ -34,38 +44,126 @@ totalTonnage = sum([mech.chassis.weight for mech in Hangar.query.all()])
 print "Tonnage used (average): %d (%.2f)" % (usedTonnage, round(usedTonnage/2.0/games_finished,2))
 print "Tonnage total (average): %d (%.2f)" % (totalTonnage, round(totalTonnage/mechs_in_hangar,2))
 
+# total weights per user
+weightsAll = {}
+for user in User.query.all():
+    # user is home
+    game_home = Game.query.filter_by(status=3,player_home_id = user.id).all()
+    weightsOwn = [game.mech_home.chassis.weight for game in game_home]
+    weightsEnemy = [game.mech_away.chassis.weight for game in game_home]
+
+    # user is away
+    game_away = Game.query.filter_by(status=3,player_away_id = user.id).all()
+    weightsOwn += [game.mech_away.chassis.weight for game in game_away]
+    weightsEnemy += [game.mech_home.chassis.weight for game in game_home]
+    if len(weightsOwn) > 0 and len(weightsEnemy) > 0:
+        weightsAll[user.username] = (sum(weightsOwn), sum(weightsEnemy))
+
+weightsAll = sorted(weightsAll.items(), key=operator.itemgetter(0), reverse=False)
+
+print "\n%-20s\t%s\t%s\t\t%s" % ("Player", "Tonnage (own)", "Tonnage (enemy)", "Difference")
+for user, value in weightsAll:
+    print "%-20s\t%8d\t%8d\t\t%+6d" % (user, value[0], value[1], value[1]-value[0])
+
 # win/loss ratio per tonnage
 games = Game.query.filter_by(status=3).all()
 wlPerTonnage = dict.fromkeys(range(20,101,5), 0.0+0.0j)
+wcMatrix = [[0 for x in range(4)] for y in range(4)] # weightclass Matrix
+wMatrix = [[0 for x in range(17)] for y in range(17)] # weight Matrix
 for game in games:
+    weightHome = game.mech_home.chassis.weight
+    weightAway = game.mech_away.chassis.weight
     # home is winner
     if game.winner == game.player_home_id:
-        wlPerTonnage[game.mech_home.chassis.weight] += complex(1.0, 0.0)
-        wlPerTonnage[game.mech_away.chassis.weight] += complex(0.0, 1.0)
+        wlPerTonnage[weightHome] += complex(1.0, 0.0)
+        wlPerTonnage[weightAway] += complex(0.0, 1.0)
+        wcMatrix[calculateWeightClass(weightHome)][calculateWeightClass(weightAway)] += 1
+        wMatrix[weightHome/5-4][weightAway/5-4] += 1
     # away is winner
     else:
-        wlPerTonnage[game.mech_away.chassis.weight] += complex(1.0, 0.0)
-        wlPerTonnage[game.mech_home.chassis.weight] += complex(0.0, 1.0)
+        wlPerTonnage[weightAway] += complex(1.0, 0.0)
+        wlPerTonnage[weightHome] += complex(0.0, 1.0)
+        wcMatrix[calculateWeightClass(weightAway)][calculateWeightClass(weightHome)] += 1
+        wMatrix[weightAway/5-4][weightHome/5-4] += 1
 
 scorePerTonnage = dict.fromkeys(range(20,101,5), (0.0, 0.0, 0.0, 0.0))
 for tonnage, value in wlPerTonnage.iteritems():
     if abs(value) > 0.0:
-        scorePerTonnage[tonnage] = (value.real/(value.real+value.imag), value.real, value.imag)
+        scorePerTonnage[tonnage] = (value.real/(value.real+value.imag), value.real, value.imag, value.real+value.imag)
 scorePerTonnage = sorted(scorePerTonnage.items(), key=operator.itemgetter(1), reverse=True)
 
-print "\nTonnage\t\tWin/Loss\tWin\tLoss"
+print "\nTonnage\t\tWin/Loss\tWin\tLoss\tUsage"
 for tonnage, value in scorePerTonnage:
-    print "%3d\t\t%6.2f\t\t%2d\t%3d" % (tonnage, value[0], value[1], value[2])
+    print "%4d\t\t%6.2f\t\t%2d\t%3d\t%3d" % (tonnage, value[0], value[1], value[2], value[3])
 
-weightseen = {}
-for user in User.query.all():
-    game_home = Game.query.filter_by(status=3,player_home_id = user.id).all()
-    weights = [game.mech_away.chassis.weight for game in game_home]
-    game_away = Game.query.filter_by(status=3,player_away_id = user.id).all()
-    weights += [game.mech_home.chassis.weight for game in game_home]
-    if len(weights) > 0:
-        weightseen[user.username] = sum(weights)
+# win/loss per chassis
+games = Game.query.filter_by(status=3).all()
+wlPerChassis = {}
+scorePerChassis = {}
+for mech in Chassis.query.all():
+    wlPerChassis[mech.name] = complex(0.0, 0.0)
+    scorePerChassis[mech.name] = (0.0, 0.0, 0.0, 0.0)
+    
+for game in games:
+    # home is winner
+    if game.winner == game.player_home_id:
+        wlPerChassis[game.mech_home.chassis.name] += complex(1.0, 0.0)
+        wlPerChassis[game.mech_away.chassis.name] += complex(0.0, 1.0)
+    # away is winner
+    else:
+        wlPerChassis[game.mech_away.chassis.name] += complex(1.0, 0.0)
+        wlPerChassis[game.mech_home.chassis.name] += complex(0.0, 1.0)
 
-print "\n%-20s %s" % ("Player", "Enemy Tonnage")
-for x in sorted(weightseen.items(), key=operator.itemgetter(1), reverse=True):
-    print "%-20s %4i" % x
+for mech, value in wlPerChassis.iteritems():
+    if abs(value) > 0.0:
+        scorePerChassis[mech] = (value.real/(value.real+value.imag), value.real, value.imag, value.real+value.imag)
+scorePerChassis = sorted(scorePerChassis.items(), key=operator.itemgetter(1), reverse=True)
+
+print "\nMech\t\t\tWin/Loss\tWin\tLoss\tUsage"
+for mech, value in scorePerChassis:
+    print "%-15s\t\t%6.2f\t\t%2d\t%3d\t%3d" % (mech, value[0], value[1], value[2], value[3])
+
+# win/loss per class
+games = Game.query.filter_by(status=3).all()
+wlPerClass = {
+    'Light' : complex(0.0, 0.0),
+    'Medium' : complex(0.0, 0.0),
+    'Heavy' : complex(0.0, 0.0),
+    'Assault' : complex(0.0, 0.0)
+}
+scorePerClass = {
+    'Light' : (0.0, 0.0, 0.0, 0.0),
+    'Medium' : (0.0, 0.0, 0.0, 0.0),
+    'Heavy' : (0.0, 0.0, 0.0, 0.0),
+    'Assault' : (0.0, 0.0, 0.0, 0.0)
+}
+
+for game in games:
+    # home is winner
+    if game.winner == game.player_home_id:
+        wlPerClass[game.mech_home.chassis.weightclass] += complex(1.0, 0.0)
+        wlPerClass[game.mech_away.chassis.weightclass] += complex(0.0, 1.0)
+    # away is winner
+    else:
+        wlPerClass[game.mech_away.chassis.weightclass] += complex(1.0, 0.0)
+        wlPerClass[game.mech_home.chassis.weightclass] += complex(0.0, 1.0)
+
+for weightclass, value in wlPerClass.iteritems():
+    if abs(value) > 0.0:
+        scorePerClass[weightclass] = (value.real/(value.real+value.imag), value.real, value.imag, value.real+value.imag)
+scorePerClass = sorted(scorePerClass.items(), key=operator.itemgetter(1), reverse=True)
+
+print "\nClass\t\t\tWin/Loss\tWin\tLoss\tUsage"
+for weightclass, value in scorePerClass:
+    print "%-15s\t\t%6.2f\t\t%2d\t%3d\t%3d" % (weightclass, value[0], value[1], value[2], value[3])
+
+# print weight class matrix
+print "\nweight class matrix"
+for row in wcMatrix:
+    print " ".join(map(str,row))
+
+# print weight matrix
+print "\nweight matrix"
+for row in wMatrix:
+    print " ".join(map(str,row)) 
+
